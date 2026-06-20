@@ -2,40 +2,34 @@ services:
   backend:
     build:
       context: ./app/backend
-
+    container_name: flask-backend
     ports:
       - "5000:5000"
-
     environment:
       FLASK_ENV: development
-
+      DATABASE_URL: postgresql://devuser:devpass@postgres:5432/devdb
     depends_on:
       - postgres
-
     networks:
       - devops-network
 
   postgres:
     image: postgres:16
-
-    restart: unless-stopped
-
+    container_name: postgres-db
+    restart: always
     environment:
-      POSTGRES_USER: devops
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: devops_db
-
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpass
+      POSTGRES_DB: devdb
     ports:
       - "5432:5432"
-
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
     networks:
       - devops-network
 
-volumes:
-  postgres_data:
-
 networks:
   devops-network:
+
+volumes:
+  postgres_data:
