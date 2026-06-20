@@ -3,7 +3,7 @@ import time
 
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, IntegrityError
 
 db = SQLAlchemy()
 
@@ -45,15 +45,30 @@ def create_app():
     def create_user():
         data = request.get_json()
 
+        # Basic validation
+        if not data:
+            return jsonify({"error": "Request body must be JSON"}), 400
+
+        if "name" not in data or "email" not in data:
+            return jsonify({"error": "Both name and email are required"}), 400
+
         user = User(
             name=data["name"],
             email=data["email"]
         )
 
-        db.session.add(user)
-        db.session.commit()
+        try:
+            db.session.add(user)
+            db.session.commit()
 
-        return jsonify(user.to_dict()), 201
+            return jsonify(user.to_dict()), 201
+
+        except IntegrityError:
+            db.session.rollback()
+
+            return jsonify({
+                "error": "Email already exists."
+            }), 409
 
     @app.route("/users", methods=["GET"])
     def get_users():
