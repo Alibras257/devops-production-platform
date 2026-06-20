@@ -1,11 +1,22 @@
+import os
 from flask import Flask
-from config import Config
-from routes import register_routes
+from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__)
-app.config.from_object(Config)
+db = SQLAlchemy()
 
-register_routes(app)
+def create_app():
+    app = Flask(__name__)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
+        "DATABASE_URL",
+        "postgresql://devuser:devpass@postgres:5432/devdb"
+    )
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    db.init_app(app)
+
+    @app.route("/")
+    def home():
+        return {"status": "connected to app layer"}
+
+    return app
