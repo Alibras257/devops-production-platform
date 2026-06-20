@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,18 +15,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Set up Docker Buildx
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      # 2. Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      # 3. Build backend Docker image
-      - name: Build Docker image
+      # 3. Install dependencies
+      - name: Install dependencies
         run: |
-          docker build -t flask-backend ./app/backend
+          python -m pip install --upgrade pip
+          pip install -r app/backend/requirements.txt
 
-      # 4. Run container (smoke test)
-      - name: Run container test
+      # 4. Run tests
+      - name: Run pytest
         run: |
-          docker run -d -p 5000:5000 --name test-backend flask-backend
-          sleep 5
-          curl --fail http://localhost:5000/ || exit 1
+          pytest app/backend/tests -v
