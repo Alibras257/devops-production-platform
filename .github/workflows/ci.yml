@@ -1,0 +1,32 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 3. Build backend Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t flask-backend ./app/backend
+
+      # 4. Run container (smoke test)
+      - name: Run container test
+        run: |
+          docker run -d -p 5000:5000 --name test-backend flask-backend
+          sleep 5
+          curl --fail http://localhost:5000/ || exit 1
