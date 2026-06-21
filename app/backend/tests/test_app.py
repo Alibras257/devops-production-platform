@@ -3,11 +3,13 @@ from app import create_app
 
 def test_home():
     app = create_app()
+    app.testing = True
+
     client = app.test_client()
 
     response = client.get("/")
 
     assert response.status_code == 200
-    assert response.json == {
+    assert response.get_json() == {
         "status": "connected to app layer"
     }
