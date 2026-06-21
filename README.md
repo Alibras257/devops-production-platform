@@ -1,140 +1,124 @@
-# DevOps Production Platform 🚀
+# DevOps Production Platform
 
-A full-stack DevOps project demonstrating a **containerized Flask API**, **PostgreSQL database**, **CI/CD pipeline**, and **cloud deployment on Render**.
+A full-stack DevOps project demonstrating a containerised Flask backend with PostgreSQL, deployed using Docker and Kubernetes.
 
----
-
-## 🌐 Live Application
-
-👉 https://devops-production-platform.onrender.com
+This project focuses on real-world DevOps practices including containerisation, orchestration, deployment debugging, and production-style configuration.
 
 ---
 
-## 📌 Features
+## 🚀 Live API
 
-- Flask REST API (CRUD operations)
-- PostgreSQL database (cloud-hosted on Render)
-- Docker containerization
-- Gunicorn production server
-- GitHub Actions CI pipeline
-- Automatic deployment on Render (CD)
-- Circular import-safe architecture (production pattern)
+Kubernetes NodePort:
 
----
-
-## 🧱 Tech Stack
-
-- Python 3.12
-- Flask
-- Flask-SQLAlchemy
-- PostgreSQL (Render)
-- Docker
-- Gunicorn
-- GitHub Actions
-- Render (Cloud Hosting)
-
----
-
-## 📡 API Endpoints
-
-### Health Check
-
-GET /
-GET /users
-POST /users
-GET /users/<id>
-PUT /users/<id>
-DELETE /users/<id>
-### Users API
+http://localhost:30910/
 
 
----
+Response:
+```json
+{
+  "status": "connected to app layer"
+}
+🧠 Architecture
 
-## 🧪 Example Requests
+Client → Flask API (Gunicorn) → PostgreSQL → Docker → Kubernetes
 
-### Create User
-```bash
-curl -X POST https://devops-production-platform.onrender.com/users \
--H "Content-Type: application/json" \
--d '{"name":"Ali","email":"ali@example.com"}'
-
-### Get All Users
-curl https://devops-production-platform.onrender.com/users
-
-## Update User
-curl -X PUT https://devops-production-platform.onrender.com/users/1 \
--H "Content-Type: application/json" \
--d '{"name":"Updated Name","email":"updated@example.com"}'
-
-## Delete User
-curl -X DELETE https://devops-production-platform.onrender.com/users/1
-
-## Run locally (Docker)
+⚙️ Tech Stack
+Python 3.12
+Flask
+SQLAlchemy
+PostgreSQL
+Docker
+Kubernetes
+Gunicorn
+Pytest
+GitHub
+📁 Project Structure
+devops-production-platform/
+│
+├── app/
+│   ├── backend/
+│   │   ├── app.py
+│   │   ├── models.py
+│   │   ├── routes.py
+│   │   ├── config.py
+│   │   ├── utils.py
+│   │   ├── requirements.txt
+│   │   └── tests/
+│   │       └── test_app.py
+│
+├── docker/
+├── kubernetes/
+├── scripts/
+├── monitoring/
+├── terraform/
+└── README.md
+🔧 Setup Instructions
+1. Clone repository
 git clone https://github.com/Alibras257/devops-production-platform.git
 cd devops-production-platform
+2. Run with Docker
+docker build -t flask-backend .
+docker run -p 5000:5000 flask-backend
+3. Deploy to Kubernetes
+kubectl apply -f kubernetes/
+kubectl get pods
+kubectl get svc
+4. Test API
+curl http://localhost:30910/
+🗄️ Environment Variables
 
-docker compose up --build
+The application uses:
 
-## App run at 
-http://localhost:5000
+DATABASE_URL=postgresql://user:password@host:5432/dbname
 
-## Environment Variables
+⚠️ IMPORTANT:
 
-## Create a .env file or set in Render:
-DATABASE_URL=your_postgres_connection_string
-FLASK_ENV=production
+Must NOT use https://
+Must be a valid PostgreSQL connection string
+🧪 Run Tests
+pytest app/backend/tests -v
+🐳 Docker
+Multi-stage containerised Flask app
+Runs using Gunicorn
+Optimised lightweight Python image
+☸️ Kubernetes
+Deployment: Flask backend
+Service: NodePort
+Exposes container port 5000 → 30910
+🧯 Common Issues
+CrashLoopBackOff
 
+Usually caused by:
 
-🏗 Architecture Overview
+Wrong DATABASE_URL
+Missing dependencies
+Import errors
+SQLAlchemy Error
+Can't load plugin: sqlalchemy.dialects:https
 
-This project follows a production-grade DevOps workflow:
+Fix:
+Use:
 
-Flask application containerized using Docker
-PostgreSQL database hosted on Render
-Gunicorn used as production WSGI server
-GitHub Actions used for CI (tests & validation)
-Render handles continuous deployment (CD)
-Factory pattern used to prevent circular imports
+postgresql://
 
-🔄 CI/CD Pipeline
+NOT:
 
-Continuous Integration (GitHub Actions)
-Runs tests using pytest
-Validates Python environment
-Ensures build stability before deployment
-
-Continuous Deployment (Render)
-
-Automatically deploys from main branch
-Builds Docker image
-Restarts service on new commits
-
-## Project Structure
-app/
- └── backend/
-     ├── app.py
-     ├── models.py
-     ├── routes.py
-     ├── config.py
-     ├── requirements.txt
-     └── tests/
-
-     🚀 Key DevOps Concepts Demonstrated
-Containerization (Docker)
-Cloud deployment (Render)
-CI/CD pipeline (GitHub Actions + Render)
-Infrastructure as Code mindset
-Environment-based configuration
-Microservice-style backend structure
-Production debugging (imports, DB, deployment issues)
-
+https://
+📌 Key Achievements
+Fixed circular import issues in Flask app
+Resolved SQLAlchemy database connection problems
+Built Docker container successfully
+Deployed to Kubernetes cluster
+Debugged CrashLoopBackOff issues
+Exposed working NodePort service
+End-to-end API validation completed
 👨‍💻 Author
 
-Ibraheem Aloyinlapa
+DevOps Project – Ibraheem Aloyinlapa
 
-📌 Future Improvements
-Add database migrations (Alembic)
-Add authentication (JWT)
-Add monitoring (Prometheus + Grafana)
-Deploy with Kubernetes (EKS / GKE)
-Add frontend dashboard
+📊 Status
+
+✔ Backend working
+✔ Kubernetes deployed
+✔ Database connected
+✔ API fully functional
