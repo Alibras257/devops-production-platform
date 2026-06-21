@@ -18,6 +18,7 @@ Response:
 {
   "status": "connected to app layer"
 }
+
 🧠 Architecture
 
 Client → Flask API (Gunicorn) → PostgreSQL → Docker → Kubernetes
@@ -32,7 +33,9 @@ Kubernetes
 Gunicorn
 Pytest
 GitHub
+
 📁 Project Structure
+
 devops-production-platform/
 │
 ├── app/
@@ -52,7 +55,9 @@ devops-production-platform/
 ├── monitoring/
 ├── terraform/
 └── README.md
+
 🔧 Setup Instructions
+
 1. Clone repository
 git clone https://github.com/Alibras257/devops-production-platform.git
 cd devops-production-platform
@@ -64,6 +69,7 @@ kubectl apply -f kubernetes/
 kubectl get pods
 kubectl get svc
 4. Test API
+
 curl http://localhost:30910/
 🗄️ Environment Variables
 
@@ -77,14 +83,17 @@ Must NOT use https://
 Must be a valid PostgreSQL connection string
 🧪 Run Tests
 pytest app/backend/tests -v
+
 🐳 Docker
 Multi-stage containerised Flask app
 Runs using Gunicorn
 Optimised lightweight Python image
+
 ☸️ Kubernetes
 Deployment: Flask backend
 Service: NodePort
 Exposes container port 5000 → 30910
+
 🧯 Common Issues
 CrashLoopBackOff
 
@@ -104,6 +113,7 @@ postgresql://
 NOT:
 
 https://
+
 📌 Key Achievements
 Fixed circular import issues in Flask app
 Resolved SQLAlchemy database connection problems
