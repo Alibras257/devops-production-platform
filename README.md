@@ -1,175 +1,140 @@
-# DevOps Production Platform
+# DevOps Production Platform 🚀
 
-A production-ready backend application built with **Flask**, **PostgreSQL**, and **Docker**. This project demonstrates modern DevOps practices, containerization, database integration, and backend API development.
-
----
-
-## Features
-
-* Flask REST API
-* PostgreSQL database
-* SQLAlchemy ORM
-* Dockerized backend and database
-* Docker Compose orchestration
-* Automatic database initialization
-* Production-ready project structure
+A full-stack DevOps project demonstrating a **containerized Flask API**, **PostgreSQL database**, **CI/CD pipeline**, and **cloud deployment on Render**.
 
 ---
 
-## Tech Stack
+## 🌐 Live Application
 
-* Python 3.12
-* Flask
-* SQLAlchemy
-* PostgreSQL 16
-* Docker
-* Docker Compose
-* Gunicorn
+👉 https://devops-production-platform.onrender.com
 
 ---
 
-## Project Structure
+## 📌 Features
 
-```text
-devops-production-platform/
-│
-├── app/
-│   └── backend/
-│       ├── app.py
-│       ├── models.py
-│       ├── requirements.txt
-│       └── Dockerfile
-│
-├── docker-compose.yml
-├── .gitignore
-└── README.md
-```
+- Flask REST API (CRUD operations)
+- PostgreSQL database (cloud-hosted on Render)
+- Docker containerization
+- Gunicorn production server
+- GitHub Actions CI pipeline
+- Automatic deployment on Render (CD)
+- Circular import-safe architecture (production pattern)
 
 ---
 
-## Getting Started
+## 🧱 Tech Stack
 
-### Clone the repository
-
-```bash
-git clone https://github.com/Alibras257/devops-production-platform.git
-cd devops-production-platform
-```
-
-### Build and start the application
-
-```bash
-docker compose up --build
-```
-
-The application will be available at:
-
-```
-http://localhost:5000
-```
+- Python 3.12
+- Flask
+- Flask-SQLAlchemy
+- PostgreSQL (Render)
+- Docker
+- Gunicorn
+- GitHub Actions
+- Render (Cloud Hosting)
 
 ---
 
-## Database
-
-The application uses PostgreSQL running inside Docker.
-
-Default configuration:
-
-| Variable | Value    |
-| -------- | -------- |
-| Database | devdb    |
-| Username | devuser  |
-| Password | devpass  |
-| Host     | postgres |
-| Port     | 5432     |
-
-SQLAlchemy automatically creates the required tables during application startup.
-
----
-
-## Current API
+## 📡 API Endpoints
 
 ### Health Check
 
-```
 GET /
-```
+GET /users
+POST /users
+GET /users/<id>
+PUT /users/<id>
+DELETE /users/<id>
+### Users API
 
-Example response:
-
-```json
-{
-    "status": "connected to app layer"
-}
-```
 
 ---
 
-## Docker Commands
+## 🧪 Example Requests
 
-Build containers
-
+### Create User
 ```bash
+curl -X POST https://devops-production-platform.onrender.com/users \
+-H "Content-Type: application/json" \
+-d '{"name":"Ali","email":"ali@example.com"}'
+
+### Get All Users
+curl https://devops-production-platform.onrender.com/users
+
+## Update User
+curl -X PUT https://devops-production-platform.onrender.com/users/1 \
+-H "Content-Type: application/json" \
+-d '{"name":"Updated Name","email":"updated@example.com"}'
+
+## Delete User
+curl -X DELETE https://devops-production-platform.onrender.com/users/1
+
+## Run locally (Docker)
+git clone https://github.com/Alibras257/devops-production-platform.git
+cd devops-production-platform
+
 docker compose up --build
-```
 
-Run in detached mode
+## App run at 
+http://localhost:5000
 
-```bash
-docker compose up -d
-```
+## Environment Variables
 
-Stop containers
+## Create a .env file or set in Render:
+DATABASE_URL=your_postgres_connection_string
+FLASK_ENV=production
 
-```bash
-docker compose down
-```
 
-Remove containers and database volume
+🏗 Architecture Overview
 
-```bash
-docker compose down -v
-```
+This project follows a production-grade DevOps workflow:
 
-View logs
+Flask application containerized using Docker
+PostgreSQL database hosted on Render
+Gunicorn used as production WSGI server
+GitHub Actions used for CI (tests & validation)
+Render handles continuous deployment (CD)
+Factory pattern used to prevent circular imports
 
-```bash
-docker compose logs -f
-```
+🔄 CI/CD Pipeline
 
----
+Continuous Integration (GitHub Actions)
+Runs tests using pytest
+Validates Python environment
+Ensures build stability before deployment
 
-## Future Improvements
+Continuous Deployment (Render)
 
-* CRUD API endpoints
-* Flask-Migrate database migrations
-* JWT Authentication
-* Unit and integration tests
-* GitHub Actions CI/CD
-* Docker image publishing
-* Kubernetes deployment
-* Monitoring with Prometheus and Grafana
-* Nginx reverse proxy
+Automatically deploys from main branch
+Builds Docker image
+Restarts service on new commits
 
----
+## Project Structure
+app/
+ └── backend/
+     ├── app.py
+     ├── models.py
+     ├── routes.py
+     ├── config.py
+     ├── requirements.txt
+     └── tests/
 
-## Learning Goals
+     🚀 Key DevOps Concepts Demonstrated
+Containerization (Docker)
+Cloud deployment (Render)
+CI/CD pipeline (GitHub Actions + Render)
+Infrastructure as Code mindset
+Environment-based configuration
+Microservice-style backend structure
+Production debugging (imports, DB, deployment issues)
 
-This project is designed to demonstrate:
+👨‍💻 Author
 
-* Backend API development
-* Docker containerization
-* PostgreSQL integration
-* SQLAlchemy ORM
-* DevOps best practices
-* Production-ready application architecture
+Ibraheem Aloyinlapa
 
----
-
-## Author
-
-**Ibraheem Aloyinlapa**
-
-GitHub: https://github.com/Alibras257
-
+📌 Future Improvements
+Add database migrations (Alembic)
+Add authentication (JWT)
+Add monitoring (Prometheus + Grafana)
+Deploy with Kubernetes (EKS / GKE)
+Add frontend dashboard
