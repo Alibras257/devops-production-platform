@@ -20,7 +20,7 @@ def create_app():
     db.init_app(app)
 
     # Import models AFTER db init
-    from models import User
+    from backend.models import User
 
     # Create tables with retry (Postgres readiness)
     with app.app_context():
