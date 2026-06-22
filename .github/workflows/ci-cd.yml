@@ -2,17 +2,41 @@ name: DevOps CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   test:
-    name: Run Tests (Pytest)
+    name: Run Tests
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+
+        env:
+          POSTGRES_USER: devuser
+          POSTGRES_PASSWORD: devpass
+          POSTGRES_DB: devdb
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd="pg_isready -U devuser -d devdb"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: postgresql://devuser:devpass@localhost:5432/devdb
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -20,24 +44,38 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U devuser -d devdb
+          do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r app/backend/requirements.txt
 
       - name: Run tests
+        working-directory: app/backend
+        env:
+          PYTHONPATH: .
         run: |
-          pytest app/backend/tests -v
+          pytest tests -v
 
----
-
-  build:
-    name: Build Docker Image
-    runs-on: ubuntu-latest
+  docker:
+    name: Build & Push Docker Image
     needs: test
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Log in to Docker Hub
@@ -48,9 +86,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/flask-backend:latest .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/flask-backend:latest app/backend
 
       - name: Push Docker image
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/flask-backend:latest
-
