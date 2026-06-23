@@ -47,7 +47,7 @@ resource "aws_route_table_association" "public_assoc" {
 
 resource "aws_security_group" "devops_sg" {
   name        = "devops-production-sg"
-  description = "Allow SSH, HTTP, and app traffic"
+  description = "Allow SSH, HTTP, and Flask app traffic"
   vpc_id      = aws_vpc.devops_vpc.id
 
   ingress {
@@ -93,6 +93,20 @@ resource "aws_instance" "devops_server" {
   vpc_security_group_ids      = [aws_security_group.devops_sg.id]
   associate_public_ip_address = true
   key_name                    = var.key_name
+
+  user_data = <<-EOF
+              #!/bin/bash
+              set -eux
+              yum update -y
+              amazon-linux-extras install docker -y
+              systemctl enable docker
+              systemctl start docker
+              usermod -aG docker ec2-user
+              sleep 10
+              docker rm -f flask-backend || true
+              docker pull alibras257/flask-backend:latest
+              docker run -d -p 5000:5000 --name flask-backend alibras257/flask-backend:latest
+              EOF
 
   tags = {
     Name = "devops-production-server"
