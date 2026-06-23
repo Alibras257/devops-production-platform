@@ -2,6 +2,7 @@ import os
 import time
 
 from flask import Flask, jsonify, request
+from prometheus_flask_exporter import PrometheusMetrics
 from sqlalchemy.exc import IntegrityError, OperationalError
 
 from extensions import db
@@ -18,6 +19,7 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+    PrometheusMetrics(app)
 
     with app.app_context():
         for i in range(10):

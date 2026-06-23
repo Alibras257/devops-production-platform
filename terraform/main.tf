@@ -97,15 +97,58 @@ resource "aws_instance" "devops_server" {
   user_data = <<-EOF
               #!/bin/bash
               set -eux
+
               yum update -y
               amazon-linux-extras install docker -y
+              amazon-linux-extras install nginx1 -y
+
               systemctl enable docker
               systemctl start docker
+
+              systemctl enable nginx
+              systemctl start nginx
+
               usermod -aG docker ec2-user
+
               sleep 10
+
               docker rm -f flask-backend || true
               docker pull alibras257/flask-backend:latest
               docker run -d -p 5000:5000 --name flask-backend alibras257/flask-backend:latest
+
+              cat > /etc/nginx/nginx.conf <<'EONGINX'
+              user nginx;
+              worker_processes auto;
+              error_log /var/log/nginx/error.log;
+              pid /run/nginx.pid;
+
+              events {
+                  worker_connections 1024;
+              }
+
+              http {
+                  include       /etc/nginx/mime.types;
+                  default_type  application/octet-stream;
+
+                  sendfile        on;
+                  keepalive_timeout 65;
+
+                  server {
+                      listen 80;
+                      server_name _;
+
+                      location / {
+                          proxy_pass http://127.0.0.1:5000;
+                          proxy_set_header Host $host;
+                          proxy_set_header X-Real-IP $remote_addr;
+                          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                          proxy_set_header X-Forwarded-Proto $scheme;
+                      }
+                  }
+              }
+              EONGINX
+
+              systemctl restart nginx
               EOF
 
   tags = {
