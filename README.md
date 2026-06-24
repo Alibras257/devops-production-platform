@@ -10,10 +10,12 @@
 ![AWS](https://img.shields.io/badge/AWS-EC2-orange?logo=amazon-aws)
 ![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?logo=prometheus)
 ![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?logo=grafana)
+![Alertmanager](https://img.shields.io/badge/Alertmanager-Alerting-orange)
+![Node_Exporter](https://img.shields.io/badge/Node_Exporter-System_Metrics-5A5A5A)
 ![Render](https://img.shields.io/badge/Render-Deployed-46E3B7?logo=render)
 ![License](https://img.shields.io/badge/License-Educational-lightgrey)
 
-A production-style DevOps platform that demonstrates how to build, test, containerize, deploy, and monitor a backend application using Flask, PostgreSQL, Docker, Kubernetes, Terraform, GitHub Actions, AWS, Prometheus, and Grafana.
+A production-style DevOps platform that demonstrates how to build, test, containerize, deploy, monitor, and alert on a backend application using Flask, PostgreSQL, Docker, Kubernetes, Terraform, GitHub Actions, AWS, Prometheus, Grafana, Node Exporter, and Alertmanager.
 
 ---
 
@@ -21,7 +23,7 @@ A production-style DevOps platform that demonstrates how to build, test, contain
 
 This project is a backend-focused DevOps platform built with Flask and PostgreSQL, packaged with Docker, validated through automated testing, and integrated with a CI/CD pipeline using GitHub Actions.
 
-The platform also includes Terraform-based AWS infrastructure provisioning, automated EC2 deployment using `user_data`, Prometheus monitoring, and Grafana dashboard provisioning for backend observability.
+The platform also includes Terraform-based AWS infrastructure provisioning, automated EC2 deployment using `user_data`, Prometheus monitoring, Grafana dashboard provisioning, Node Exporter system metrics collection, and Alertmanager-based alert handling.
 
 The purpose of this project is to demonstrate practical DevOps, cloud, and platform engineering skills, including:
 
@@ -33,6 +35,8 @@ The purpose of this project is to demonstrate practical DevOps, cloud, and platf
 - infrastructure provisioning with Terraform
 - automated cloud deployment on AWS EC2
 - monitoring and observability with Prometheus and Grafana
+- system-level monitoring with Node Exporter
+- service alerting with Alertmanager
 
 ---
 
@@ -52,6 +56,9 @@ The purpose of this project is to demonstrate practical DevOps, cloud, and platf
 - Docker image pulled and deployed automatically on instance launch
 - Prometheus metrics collection from the Flask backend
 - Grafana dashboard provisioning for visualization
+- Node Exporter metrics collection for host and system visibility
+- Alertmanager integration for alert routing and alert state management
+- Prometheus alert rules for service availability and CPU monitoring
 - Clean project structure for portfolio and production-style presentation
 
 ---
@@ -65,7 +72,8 @@ The purpose of this project is to demonstrate practical DevOps, cloud, and platf
 - **CI/CD:** GitHub Actions
 - **Infrastructure as Code:** Terraform
 - **Cloud Platform:** AWS EC2, Render
-- **Monitoring:** Prometheus, Grafana
+- **Monitoring:** Prometheus, Grafana, Node Exporter
+- **Alerting:** Alertmanager, Prometheus Alert Rules
 - **Testing:** Pytest
 
 ---
@@ -96,6 +104,8 @@ devops-production-platform/
 │   └── backend-service.yml
 ├── monitoring/
 │   ├── prometheus.yml
+│   ├── alert.rules.yml
+│   ├── alertmanager.yml
 │   └── grafana/
 │       ├── dashboards/
 │       │   └── flask-dashboard.json
@@ -167,8 +177,20 @@ text
                                    |
                                    v
                         +----------------------+
+                        |   Node Exporter      |
+                        |  System Metrics      |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
                         | Grafana Dashboards   |
                         | Visualizes Metrics   |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        |   Alertmanager       |
+                        | Handles Alerts       |
                         +----------------------+
 CI/CD Workflow
 The GitHub Actions pipeline automates the following:
@@ -200,20 +222,38 @@ enabling and starting the Docker service
 pulling the application image from Docker Hub
 running the Flask backend container automatically on launch
 Monitoring and Observability
-The platform includes a local monitoring stack using Prometheus and Grafana.
+The platform includes a local monitoring stack using Prometheus, Grafana, and Node Exporter.
 
 Prometheus
-Prometheus scrapes application metrics from the Flask backend through the /metrics endpoint.
+Prometheus scrapes application metrics from the Flask backend through the /metrics endpoint and also scrapes system metrics from Node Exporter.
 
 Grafana
-Grafana is connected to Prometheus as a data source and automatically provisions a dashboard for backend monitoring.
+Grafana is connected to Prometheus as a data source and automatically provisions a dashboard for backend and system monitoring.
 
+Node Exporter
+Node Exporter provides system-level metrics such as:
+
+CPU usage
+memory usage
+network traffic
+node availability
 The monitoring setup provides visibility into:
 
 backend availability
 HTTP request rate
 HTTP request count
 application-level Prometheus metrics
+host-level health and usage data
+Alerting
+The platform includes Alertmanager and Prometheus alert rules for basic operational alerting.
+
+Configured alert rules include:
+
+FlaskBackendDown — triggers when the backend is unreachable
+NodeExporterDown — triggers when Node Exporter becomes unavailable
+HighCPUUsage — triggers when CPU usage remains above threshold
+Prometheus evaluates alert rules and sends firing alerts to Alertmanager for handling.
+
 How It Works
 Code is pushed to GitHub.
 GitHub Actions triggers the CI/CD pipeline automatically.
@@ -223,8 +263,9 @@ Terraform provisions AWS infrastructure for deployment.
 The EC2 instance launches and runs bootstrap commands through user_data.
 Docker is installed automatically on the instance.
 The backend image is pulled from Docker Hub and started automatically.
-Prometheus collects metrics from the backend application.
-Grafana visualizes the application metrics through a provisioned dashboard.
+Prometheus collects metrics from the backend and Node Exporter.
+Grafana visualizes application and system metrics through provisioned dashboards.
+Prometheus evaluates alert rules and sends firing alerts to Alertmanager.
 Installation and Setup
 1. Clone the repository
 bash
@@ -252,7 +293,7 @@ Run the container
 bash
 docker run -p 5000:5000 flask-backend
 Run with Docker Compose
-To start the backend, PostgreSQL, Prometheus, and Grafana together:
+To start the backend, PostgreSQL, Prometheus, Grafana, Node Exporter, and Alertmanager together:
 
 bash
 docker-compose up --build
@@ -281,12 +322,12 @@ To replace the EC2 instance and re-run automated provisioning:
 bash
 terraform apply -replace="aws_instance.devops_server"
 Remote Terraform State
-The project uses an S3 backend for Terraform state storage and supports state locking through a bootstrap Terraform configuration.
+The project uses an S3 backend for Terraform state storage and supports safer state handling through bootstrap infrastructure.
 
 Bootstrap resources include:
 
 S3 bucket for Terraform state
-lock configuration for safer state operations
+remote backend configuration
 Bootstrap example:
 
 bash
@@ -316,6 +357,9 @@ Default Grafana login:
 text
 Username: admin
 Password: admin
+Alertmanager UI
+text
+http://localhost:9093
 Provisioned Dashboard
 Grafana automatically loads:
 
@@ -352,7 +396,9 @@ provisioning cloud infrastructure with Terraform
 automating EC2 configuration with user_data
 deploying containerized applications to AWS
 exposing observability data through Prometheus metrics
+collecting host-level metrics with Node Exporter
 visualizing service health and usage through Grafana dashboards
+implementing operational alerting with Alertmanager
 preparing services for Kubernetes-based deployment
 maintaining a clean and reproducible development workflow
 It is suitable for showcasing DevOps, Cloud, Platform Engineering, SRE, and Backend engineering capabilities.
@@ -360,8 +406,7 @@ It is suitable for showcasing DevOps, Cloud, Platform Engineering, SRE, and Back
 Future Improvements
 Potential next enhancements:
 
-add Node Exporter for host-level system metrics
-configure alerting for service availability and request anomalies
+configure external alert receivers such as email or Slack
 add HTTPS and domain configuration
 harden public access by exposing only the reverse proxy
 package Kubernetes resources with Helm

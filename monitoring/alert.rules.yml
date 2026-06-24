@@ -1,0 +1,29 @@
+groups:
+  - name: devops-production-platform-alerts
+    rules:
+      - alert: FlaskBackendDown
+        expr: up{job="flask-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Flask backend is down"
+          description: "The Flask backend target has been unreachable for more than 1 minute."
+
+      - alert: NodeExporterDown
+        expr: up{job="node-exporter"} == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Node exporter is down"
+          description: "The node-exporter target has been unreachable for more than 1 minute."
+
+      - alert: HighCPUUsage
+        expr: (100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)) > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage on {{ $labels.instance }} has been above 80% for more than 2 minutes."
