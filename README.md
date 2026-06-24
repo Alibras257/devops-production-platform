@@ -12,10 +12,11 @@
 ![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?logo=grafana)
 ![Alertmanager](https://img.shields.io/badge/Alertmanager-Alerting-orange)
 ![Node_Exporter](https://img.shields.io/badge/Node_Exporter-System_Metrics-5A5A5A)
+![Nginx](https://img.shields.io/badge/Nginx-Reverse_Proxy-009639?logo=nginx)
 ![Render](https://img.shields.io/badge/Render-Deployed-46E3B7?logo=render)
 ![License](https://img.shields.io/badge/License-Educational-lightgrey)
 
-A production-style DevOps platform that demonstrates how to build, test, containerize, deploy, monitor, and alert on a backend application using Flask, PostgreSQL, Docker, Kubernetes, Terraform, GitHub Actions, AWS, Prometheus, Grafana, Node Exporter, and Alertmanager.
+A production-style DevOps platform that demonstrates how to build, test, containerize, deploy, secure, monitor, and alert on a backend application using Flask, PostgreSQL, Docker, Kubernetes, Terraform, GitHub Actions, AWS, Prometheus, Grafana, Node Exporter, Alertmanager, and Nginx.
 
 ---
 
@@ -23,9 +24,9 @@ A production-style DevOps platform that demonstrates how to build, test, contain
 
 This project is a backend-focused DevOps platform built with Flask and PostgreSQL, packaged with Docker, validated through automated testing, and integrated with a CI/CD pipeline using GitHub Actions.
 
-The platform also includes Terraform-based AWS infrastructure provisioning, automated EC2 deployment using `user_data`, Prometheus monitoring, Grafana dashboard provisioning, Node Exporter system metrics collection, and Alertmanager-based alert handling.
+The platform also includes Terraform-based AWS infrastructure provisioning, automated EC2 deployment using `user_data`, Nginx reverse proxy configuration, Prometheus monitoring, Grafana dashboard provisioning, Node Exporter system metrics collection, and Alertmanager-based alert handling.
 
-The purpose of this project is to demonstrate practical DevOps, cloud, and platform engineering skills, including:
+The purpose of this project is to demonstrate practical DevOps, cloud, observability, and platform engineering skills, including:
 
 - application containerization
 - multi-service orchestration with Docker Compose
@@ -34,6 +35,7 @@ The purpose of this project is to demonstrate practical DevOps, cloud, and platf
 - Kubernetes deployment configuration
 - infrastructure provisioning with Terraform
 - automated cloud deployment on AWS EC2
+- reverse proxy and access hardening with Nginx
 - monitoring and observability with Prometheus and Grafana
 - system-level monitoring with Node Exporter
 - service alerting with Alertmanager
@@ -53,7 +55,9 @@ The purpose of this project is to demonstrate practical DevOps, cloud, and platf
 - Terraform infrastructure provisioning for AWS
 - Automated EC2 bootstrapping with Terraform `user_data`
 - Public cloud deployment on AWS EC2
-- Docker image pulled and deployed automatically on instance launch
+- Nginx reverse proxy serving the backend on port 80
+- Backend container bound to localhost behind Nginx
+- SSH access restricted to a trusted public IP
 - Prometheus metrics collection from the Flask backend
 - Grafana dashboard provisioning for visualization
 - Node Exporter metrics collection for host and system visibility
@@ -72,6 +76,7 @@ The purpose of this project is to demonstrate practical DevOps, cloud, and platf
 - **CI/CD:** GitHub Actions
 - **Infrastructure as Code:** Terraform
 - **Cloud Platform:** AWS EC2, Render
+- **Reverse Proxy:** Nginx
 - **Monitoring:** Prometheus, Grafana, Node Exporter
 - **Alerting:** Alertmanager, Prometheus Alert Rules
 - **Testing:** Pytest
@@ -166,7 +171,14 @@ text
                         +----------------------+
                         |      EC2 Instance    |
                         |  Docker via user_data|
-                        |  Runs Flask Backend  |
+                        |  Nginx reverse proxy |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        | Flask Backend        |
+                        | Bound to 127.0.0.1   |
+                        | Port 5000 internal   |
                         +----------+-----------+
                                    |
                                    v
@@ -213,14 +225,26 @@ a custom VPC
 a public subnet
 an internet gateway
 a route table and route table association
-a security group for SSH, HTTP, and application traffic
+a security group for HTTP access and restricted SSH access
 an EC2 instance for application hosting
 Terraform also uses EC2 user_data to automate instance bootstrapping by:
 
 installing Docker
-enabling and starting the Docker service
+installing Nginx
+enabling and starting required services
 pulling the application image from Docker Hub
 running the Flask backend container automatically on launch
+configuring Nginx as a reverse proxy
+Reverse Proxy and Security Hardening
+The AWS deployment uses Nginx as a reverse proxy in front of the Flask backend.
+
+Security improvements implemented
+public access is served through port 80
+the Flask container is bound to 127.0.0.1:5000
+direct public exposure of backend port 5000 is removed
+SSH access is restricted to a trusted public IP
+This setup better reflects a production-style deployment model by reducing unnecessary public exposure.
+
 Monitoring and Observability
 The platform includes a local monitoring stack using Prometheus, Grafana, and Node Exporter.
 
@@ -261,8 +285,9 @@ The backend application is tested using PostgreSQL and pytest.
 The Docker image is built and pushed to Docker Hub.
 Terraform provisions AWS infrastructure for deployment.
 The EC2 instance launches and runs bootstrap commands through user_data.
-Docker is installed automatically on the instance.
+Docker and Nginx are installed automatically on the instance.
 The backend image is pulled from Docker Hub and started automatically.
+Nginx proxies public HTTP traffic to the backend running locally on port 5000.
 Prometheus collects metrics from the backend and Node Exporter.
 Grafana visualizes application and system metrics through provisioned dashboards.
 Prometheus evaluates alert rules and sends firing alerts to Alertmanager.
@@ -341,8 +366,17 @@ Current deployment targets include:
 
 Render for managed cloud hosting
 AWS EC2 provisioned with Terraform for infrastructure-level deployment
-The AWS deployment uses Terraform to provision infrastructure and EC2 user_data to install Docker and start the backend container automatically.
+The AWS deployment uses Terraform to provision infrastructure and EC2 user_data to install Docker, configure Nginx, and start the backend container automatically.
 
+Access pattern
+public access:
+
+text
+http://EC2_PUBLIC_IP
+internal backend binding:
+
+text
+127.0.0.1:5000
 Note: EC2 public IPs may change if the instance is replaced or recreated.
 
 Monitoring Usage
@@ -395,6 +429,7 @@ automating testing and validation in CI/CD
 provisioning cloud infrastructure with Terraform
 automating EC2 configuration with user_data
 deploying containerized applications to AWS
+securing application access with Nginx and restricted SSH rules
 exposing observability data through Prometheus metrics
 collecting host-level metrics with Node Exporter
 visualizing service health and usage through Grafana dashboards
@@ -408,7 +443,7 @@ Potential next enhancements:
 
 configure external alert receivers such as email or Slack
 add HTTPS and domain configuration
-harden public access by exposing only the reverse proxy
+convert trusted SSH CIDR into a Terraform variable
 package Kubernetes resources with Helm
 implement GitOps with Argo CD
 expand automated test coverage

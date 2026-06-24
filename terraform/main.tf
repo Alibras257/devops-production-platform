@@ -47,7 +47,7 @@ resource "aws_route_table_association" "public_assoc" {
 
 resource "aws_security_group" "devops_sg" {
   name        = "devops-production-sg"
-  description = "Allow SSH, HTTP, and Flask app traffic"
+  description = "Allow SSH and HTTP traffic"
   vpc_id      = aws_vpc.devops_vpc.id
 
   ingress {
@@ -55,21 +55,13 @@ resource "aws_security_group" "devops_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["213.40.166.188/32"]
   }
 
   ingress {
     description = "HTTP"
     from_port   = 80
     to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Flask App"
-    from_port   = 5000
-    to_port     = 5000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -114,7 +106,7 @@ resource "aws_instance" "devops_server" {
 
               docker rm -f flask-backend || true
               docker pull alibras257/flask-backend:latest
-              docker run -d -p 5000:5000 --name flask-backend alibras257/flask-backend:latest
+              docker run -d --restart always --name flask-backend -p 127.0.0.1:5000:5000 alibras257/flask-backend:latest
 
               cat > /etc/nginx/nginx.conf <<'EONGINX'
               user nginx;
@@ -148,6 +140,7 @@ resource "aws_instance" "devops_server" {
               }
               EONGINX
 
+              nginx -t
               systemctl restart nginx
               EOF
 
