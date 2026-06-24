@@ -448,6 +448,11 @@ package Kubernetes resources with Helm
 implement GitOps with Argo CD
 expand automated test coverage
 deploy to a managed Kubernetes service such as EKS
+
+
+## Screenshots
+
+
 Author
 Ibraheem Aloyinlapa
 GitHub: Alibras257
