@@ -2,21 +2,37 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flask-backend
+  namespace: devops-platform
+  labels:
+    app: flask-backend
+
 spec:
   replicas: 2
+
   selector:
     matchLabels:
       app: flask-backend
+
   template:
     metadata:
       labels:
         app: flask-backend
+
     spec:
       containers:
         - name: flask-backend
-          image: devops-production-platform-backend:latest
+          image: flask-backend:latest
+          imagePullPolicy: Never   # IMPORTANT FIX
+
           ports:
             - containerPort: 5000
+
           env:
-            - name: DATABASE_URL
-              value: "https://devops-production-platform.onrender.com/"
+            - name: FLASK_ENV
+              value: "development"
+
+            - name: DATABASE_HOST
+              value: postgres
+
+            - name: DATABASE_PORT
+              value: "5432"
