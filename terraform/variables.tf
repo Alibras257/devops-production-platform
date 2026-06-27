@@ -4,6 +4,12 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "environment" {
+  description = "Deployment environment name"
+  type        = string
+  default     = "production"
+}
+
 variable "vpc_cidr" {
   description = "CIDR block for VPC"
   type        = string
@@ -37,4 +43,15 @@ variable "ami_id" {
 variable "key_name" {
   description = "SSH key pair name"
   type        = string
+}
+
+variable "trusted_ssh_cidr" {
+  description = "Trusted CIDR block allowed to SSH into the EC2 instance"
+  type        = string
+}
+
+variable "database_url" {
+  description = "Database connection URL for the backend application"
+  type        = string
+  sensitive   = true
 }

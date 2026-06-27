@@ -1,19 +1,17 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
-
 metadata:
   name: flask-backend-hpa
   namespace: devops-platform
-
+  labels:
+    app: flask-backend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: flask-backend
-
   minReplicas: 2
   maxReplicas: 5
-
   metrics:
     - type: Resource
       resource:

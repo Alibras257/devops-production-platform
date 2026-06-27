@@ -6,33 +6,41 @@ metadata:
   namespace: devops-platform
   labels:
     app: postgres
+<<<<<<< HEAD
     component: database
 
+=======
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)
 spec:
   replicas: 1
-
   selector:
     matchLabels:
       app: postgres
-
   template:
     metadata:
       labels:
         app: postgres
+<<<<<<< HEAD
         component: database
 
+=======
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)
     spec:
+      terminationGracePeriodSeconds: 30
       containers:
         - name: postgres
 
           image: postgres:16
+<<<<<<< HEAD
           imagePullPolicy: IfNotPresent
 
+=======
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)
           ports:
             - containerPort: 5432
-
           env:
             - name: POSTGRES_USER
+<<<<<<< HEAD
               value: devuser
 
             - name: POSTGRES_PASSWORD
@@ -74,10 +82,52 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 3
 
+=======
+              valueFrom:
+                secretKeyRef:
+                  name: flask-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: flask-secrets
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: flask-secrets
+                  key: POSTGRES_DB
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
-
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:

@@ -1,129 +1,111 @@
+name: devops-production-platform
+
 services:
   backend:
     build:
       context: ./app/backend
+      dockerfile: Dockerfile
     container_name: flask-backend
-
     restart: unless-stopped
-
     ports:
       - "5000:5000"
-
     environment:
       FLASK_ENV: production
       DATABASE_URL: postgresql://devuser:devpass@postgres:5432/devdb
-
     depends_on:
       postgres:
         condition: service_healthy
-
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5000/').read()\""]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 15s
-
+      start_period: 20s
     networks:
       - devops-network
 
   postgres:
     image: postgres:16
     container_name: postgres-db
-
-    restart: always
-
+    restart: unless-stopped
     environment:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpass
       POSTGRES_DB: devdb
-
     ports:
       - "5432:5432"
-
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U devuser -d devdb"]
       interval: 10s
       timeout: 5s
       retries: 5
-
     networks:
       - devops-network
 
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-
-    restart: always
-
+    restart: unless-stopped
     ports:
       - "9090:9090"
-
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./monitoring/alert.rules.yml:/etc/prometheus/alert.rules.yml:ro
-
     depends_on:
       - backend
       - node-exporter
       - alertmanager
-
     networks:
       - devops-network
 
   alertmanager:
     image: prom/alertmanager:latest
     container_name: alertmanager
-
-    restart: always
-
+    restart: unless-stopped
     ports:
       - "9093:9093"
-
     volumes:
       - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
-
     networks:
       - devops-network
 
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
-
-    restart: always
-
+    restart: unless-stopped
     ports:
       - "3000:3000"
-
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
       - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
       - grafana_data:/var/lib/grafana
-
     depends_on:
       - prometheus
-
     networks:
       - devops-network
 
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
-
-    restart: always
-
+    restart: unless-stopped
     ports:
       - "9100:9100"
-
+    command:
+      - --path.rootfs=/host
+    volumes:
+      - /:/host:ro,rslave
     networks:
       - devops-network
 
 networks:
   devops-network:
+    driver: bridge
 
 volumes:
   postgres_data:

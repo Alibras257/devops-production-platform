@@ -1,20 +1,27 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
-
 metadata:
   name: postgres-pvc
   namespace: devops-platform
+<<<<<<< HEAD
 
   labels:
     app: postgres
     component: database
 
+=======
+  labels:
+    app: postgres
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)
 spec:
   accessModes:
     - ReadWriteOnce
-
   resources:
     requests:
+<<<<<<< HEAD
       storage: 5Gi
 
   storageClassName: hostpath
+=======
+      storage: 5Gi
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)

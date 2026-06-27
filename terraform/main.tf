@@ -47,15 +47,15 @@ resource "aws_route_table_association" "public_assoc" {
 
 resource "aws_security_group" "devops_sg" {
   name        = "devops-production-sg"
-  description = "Allow SSH and HTTP traffic"
+  description = "Allow restricted SSH and HTTP traffic"
   vpc_id      = aws_vpc.devops_vpc.id
 
   ingress {
-    description = "SSH"
+    description = "SSH from trusted IP"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["213.40.166.188/32"]
+    cidr_blocks = [var.trusted_ssh_cidr]
   }
 
   ingress {
@@ -67,6 +67,7 @@ resource "aws_security_group" "devops_sg" {
   }
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -88,7 +89,7 @@ resource "aws_instance" "devops_server" {
 
   user_data = <<-EOF
               #!/bin/bash
-              set -eux
+              set -euxo pipefail
 
               yum update -y
               amazon-linux-extras install docker -y
@@ -106,7 +107,12 @@ resource "aws_instance" "devops_server" {
 
               docker rm -f flask-backend || true
               docker pull alibras257/flask-backend:latest
-              docker run -d --restart always --name flask-backend -p 127.0.0.1:5000:5000 alibras257/flask-backend:latest
+              docker run -d \
+                --restart always \
+                --name flask-backend \
+                -p 127.0.0.1:5000:5000 \
+                -e DATABASE_URL='${var.database_url}' \
+                alibras257/flask-backend:latest
 
               cat > /etc/nginx/nginx.conf <<'EONGINX'
               user nginx;

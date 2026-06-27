@@ -3,7 +3,12 @@ kind: Namespace
 
 metadata:
   name: devops-platform
+<<<<<<< HEAD
 
   labels:
     app.kubernetes.io/name: devops-production-platform
     app.kubernetes.io/part-of: devops-production-platform
+=======
+  labels:
+    app.kubernetes.io/name: devops-platform
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)

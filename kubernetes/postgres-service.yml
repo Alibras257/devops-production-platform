@@ -1,21 +1,30 @@
 apiVersion: v1
 kind: Service
-
 metadata:
   name: postgres-service
   namespace: devops-platform
   labels:
     app: postgres
+<<<<<<< HEAD
     component: database
 
 spec:
   type: ClusterIP
 
+=======
+spec:
+  type: ClusterIP
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)
   selector:
     app: postgres
-
   ports:
     - name: postgres
+<<<<<<< HEAD
       protocol: TCP
       port: 5432
       targetPort: 5432
+=======
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)

@@ -6,6 +6,7 @@ metadata:
   namespace: devops-platform
   labels:
     app: flask-backend
+<<<<<<< HEAD
     component: backend
 
 spec:
@@ -17,19 +18,33 @@ spec:
       maxUnavailable: 1
       maxSurge: 1
 
+=======
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)
   selector:
     matchLabels:
       app: flask-backend
-
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   template:
     metadata:
       labels:
         app: flask-backend
+<<<<<<< HEAD
         component: backend
 
+=======
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)
     spec:
+      terminationGracePeriodSeconds: 30
       containers:
         - name: flask-backend
+<<<<<<< HEAD
 
           image: devops-production-platform-backend:latest
           imagePullPolicy: IfNotPresent
@@ -38,12 +53,24 @@ spec:
             - name: http
               containerPort: 5000
 
+=======
+          image: alibras257/flask-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)
           env:
+            - name: FLASK_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: flask-config
+                  key: FLASK_ENV
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
                   name: flask-secret
                   key: DATABASE_URL
+<<<<<<< HEAD
 
             - name: FLASK_ENV
               valueFrom:
@@ -66,10 +93,28 @@ spec:
               cpu: "500m"
               memory: "512Mi"
 
+=======
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)
           readinessProbe:
             httpGet:
               path: /health
               port: 5000
+<<<<<<< HEAD
             initialDelaySeconds: 10
             periodSeconds: 5
             timeoutSeconds: 3
@@ -83,3 +128,15 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
+=======
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+>>>>>>> 99f4b14 (Improve DevOps project structure and configs)
