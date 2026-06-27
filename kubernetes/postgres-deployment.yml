@@ -1,11 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: postgres
   namespace: devops-platform
-  labels:
-    app: postgres
 
 spec:
   replicas: 1
@@ -30,24 +27,14 @@ spec:
           env:
             - name: POSTGRES_USER
               value: devuser
-
             - name: POSTGRES_PASSWORD
               value: devpass
-
             - name: POSTGRES_DB
               value: devdb
 
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
-
-          resources:
-            requests:
-              cpu: "250m"
-              memory: "256Mi"
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
 
       volumes:
         - name: postgres-storage
