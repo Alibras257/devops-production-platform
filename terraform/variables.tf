@@ -50,8 +50,26 @@ variable "trusted_ssh_cidr" {
   type        = string
 }
 
-variable "database_url" {
-  description = "Database connection URL for the backend application"
+variable "db_name" {
+  description = "PostgreSQL database name"
+  type        = string
+  default     = "devdb"
+}
+
+variable "db_username" {
+  description = "PostgreSQL master username"
+  type        = string
+  default     = "devuser"
+}
+
+variable "db_password" {
+  description = "PostgreSQL master password"
   type        = string
   sensitive   = true
+}
+
+variable "db_instance_class" {
+  description = "RDS instance class"
+  type        = string
+  default     = "db.t3.micro"
 }
