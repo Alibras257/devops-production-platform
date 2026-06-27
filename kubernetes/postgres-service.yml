@@ -4,13 +4,18 @@ kind: Service
 metadata:
   name: postgres-service
   namespace: devops-platform
+  labels:
+    app: postgres
+    component: database
 
 spec:
+  type: ClusterIP
+
   selector:
     app: postgres
 
   ports:
-    - port: 5432
+    - name: postgres
+      protocol: TCP
+      port: 5432
       targetPort: 5432
-
-  type: ClusterIP

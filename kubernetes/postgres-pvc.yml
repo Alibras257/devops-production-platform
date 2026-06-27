@@ -5,6 +5,10 @@ metadata:
   name: postgres-pvc
   namespace: devops-platform
 
+  labels:
+    app: postgres
+    component: database
+
 spec:
   accessModes:
     - ReadWriteOnce

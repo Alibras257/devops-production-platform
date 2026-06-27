@@ -1,13 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: flask-backend
   namespace: devops-platform
   labels:
     app: flask-backend
+    component: backend
 
 spec:
   replicas: 2
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
 
   selector:
     matchLabels:
@@ -17,41 +25,61 @@ spec:
     metadata:
       labels:
         app: flask-backend
+        component: backend
 
     spec:
       containers:
         - name: flask-backend
-          image: YOUR_DOCKERHUB_USERNAME/flask-backend:latest
-          imagePullPolicy: Always
+
+          image: devops-production-platform-backend:latest
+          imagePullPolicy: IfNotPresent
 
           ports:
-            - containerPort: 5000
+            - name: http
+              containerPort: 5000
 
           env:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: flask-secrets
+                  name: flask-secret
                   key: DATABASE_URL
+
+            - name: FLASK_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: flask-config
+                  key: FLASK_ENV
+
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: flask-config
+                  key: APP_NAME
 
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
+              cpu: "250m"
+              memory: "256Mi"
 
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 5000
-            initialDelaySeconds: 10
-            periodSeconds: 10
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
 
           readinessProbe:
             httpGet:
               path: /health
               port: 5000
-            initialDelaySeconds: 5
+            initialDelaySeconds: 10
             periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
