@@ -63,7 +63,7 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 6,
+        "w": 8,
         "x": 0,
         "y": 0
       },
@@ -138,8 +138,8 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 6,
-        "x": 6,
+        "w": 8,
+        "x": 8,
         "y": 0
       },
       "id": 2,
@@ -162,13 +162,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "up{job=\"node-exporter\"}",
+          "expr": "up{job=\"prometheus\"}",
           "legendFormat": "",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Node Exporter Status",
+      "title": "Prometheus Status",
       "type": "stat"
     },
     {
@@ -176,16 +176,15 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "continuous-GrYlRd"
-          },
-          "unit": "percent"
+            "mode": "continuous-BlYlRd"
+          }
         },
         "overrides": []
       },
       "gridPos": {
         "h": 7,
-        "w": 6,
-        "x": 12,
+        "w": 8,
+        "x": 16,
         "y": 0
       },
       "id": 3,
@@ -208,59 +207,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[1m])) * 100)) / 100",
-          "legendFormat": "{{instance}}",
+          "expr": "sum(rate(flask_http_request_total[1m]))",
+          "legendFormat": "",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "CPU Usage",
-      "type": "stat"
-    },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "continuous-GrYlRd"
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 18,
-        "y": 0
-      },
-      "id": 4,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "((node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes)",
-          "legendFormat": "{{instance}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Memory Usage",
+      "title": "Request Rate",
       "type": "stat"
     },
     {
@@ -280,7 +233,7 @@
         "x": 0,
         "y": 7
       },
-      "id": 5,
+      "id": 4,
       "options": {
         "legend": {
           "displayMode": "list",
@@ -310,8 +263,7 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
-          },
-          "unit": "Bps"
+          }
         },
         "overrides": []
       },
@@ -321,54 +273,7 @@
         "x": 12,
         "y": 7
       },
-      "id": 6,
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "rate(node_network_receive_bytes_total[1m])",
-          "legendFormat": "{{device}} receive",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "rate(node_network_transmit_bytes_total[1m])",
-          "legendFormat": "{{device}} transmit",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "Network Traffic",
-      "type": "timeseries"
-    },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 15
-      },
-      "id": 7,
+      "id": 5,
       "options": {
         "legend": {
           "displayMode": "table",
@@ -400,9 +305,7 @@
     "flask",
     "prometheus",
     "grafana",
-    "devops",
-    "node-exporter",
-    "alerting"
+    "devops"
   ],
   "templating": {
     "list": []
@@ -415,6 +318,6 @@
   "timezone": "browser",
   "title": "Flask Backend Monitoring Dashboard",
   "uid": "flask-backend-dashboard",
-  "version": 3,
+  "version": 4,
   "weekStart": ""
 }
