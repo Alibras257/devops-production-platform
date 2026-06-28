@@ -6,57 +6,64 @@
 ![Docker](https://img.shields.io/badge/Docker-Containerized-blue?logo=docker)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestration-326CE5?logo=kubernetes)
 ![Terraform](https://img.shields.io/badge/Terraform-IaC-844FBA?logo=terraform)
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?logo=github-actions)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI/CD-2088FF?logo=github-actions)
 ![AWS](https://img.shields.io/badge/AWS-EC2-orange?logo=amazon-aws)
+![Nginx](https://img.shields.io/badge/Nginx-Reverse_Proxy-009639?logo=nginx)
 ![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?logo=prometheus)
 ![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?logo=grafana)
 ![Alertmanager](https://img.shields.io/badge/Alertmanager-Alerting-orange)
-![Nginx](https://img.shields.io/badge/Nginx-Reverse_Proxy-009639?logo=nginx)
+![Node_Exporter](https://img.shields.io/badge/Node_Exporter-System_Metrics-5A5A5A)
+![Render](https://img.shields.io/badge/Render-Deployed-46E3B7?logo=render)
 ![License](https://img.shields.io/badge/License-Educational-lightgrey)
 
-A production-style DevOps project that demonstrates application development, containerization, CI/CD, infrastructure provisioning, Kubernetes deployment, monitoring, and alerting using Flask, PostgreSQL, Docker, GitHub Actions, Terraform, AWS, Prometheus, Grafana, Alertmanager, and Nginx.
+A production-style DevOps platform that demonstrates how to build, test, containerize, deploy, secure, monitor, and alert on a backend application using Flask, PostgreSQL, Docker, Kubernetes, Terraform, GitHub Actions, AWS, Nginx, Prometheus, Grafana, Node Exporter, and Alertmanager.
 
 ---
 
 ## Project Overview
 
-This project is a backend-focused DevOps platform built with Flask and PostgreSQL. It is containerized with Docker, orchestrated locally with Docker Compose, provisioned in AWS using Terraform, and prepared for Kubernetes deployment with supporting manifests.
+This project is a backend-focused DevOps platform built with Flask and PostgreSQL, containerized with Docker, validated through automated testing, and integrated with a CI/CD pipeline using GitHub Actions.
 
-The platform also includes observability components such as Prometheus, Grafana, and Alertmanager, along with a CI/CD workflow using GitHub Actions.
+The platform also includes Terraform-based AWS infrastructure provisioning, automated EC2 deployment using `user_data`, Nginx reverse proxy configuration, Prometheus monitoring, Grafana dashboard provisioning, Node Exporter system metrics collection, and Alertmanager-based alert handling.
 
-This repository is designed to showcase practical skills in:
+The purpose of this project is to demonstrate practical DevOps, cloud, observability, and platform engineering skills, including:
 
-- backend application deployment
-- containerization with Docker
-- multi-service local orchestration with Docker Compose
-- CI/CD pipeline automation
-- Kubernetes-based deployment configuration
-- infrastructure as code with Terraform
-- AWS EC2 provisioning
-- reverse proxying with Nginx
-- monitoring and alerting with Prometheus, Grafana, and Alertmanager
+- application containerization
+- multi-service orchestration with Docker Compose
+- backend service testing and validation
+- CI/CD workflow automation with GitHub Actions
+- Kubernetes deployment configuration
+- infrastructure provisioning with Terraform
+- automated cloud deployment on AWS EC2
+- reverse proxy and access hardening with Nginx
+- monitoring and observability with Prometheus and Grafana
+- system-level monitoring with Node Exporter
+- service alerting with Alertmanager
 
 ---
 
 ## Features
 
-- Flask backend service
+- Flask backend application
 - PostgreSQL database integration
-- Dockerized backend application
-- Docker Compose for local development
+- Dockerized application setup
+- Docker Compose for local multi-container development
 - Automated testing with `pytest`
-- GitHub Actions CI/CD workflow
-- Docker image build and push automation
-- Kubernetes manifests for deployment and service exposure
-- Horizontal Pod Autoscaler configuration
-- Kubernetes ConfigMap and Secret configuration
-- Terraform-based AWS infrastructure provisioning
-- EC2 bootstrapping with `user_data`
-- Nginx reverse proxy setup
-- Prometheus metrics scraping
-- Grafana dashboard provisioning
-- Alertmanager configuration and alert rules
-- Portfolio-ready project structure
+- GitHub Actions CI/CD pipeline
+- Docker Hub image build and push automation
+- Kubernetes deployment and service manifests
+- Terraform infrastructure provisioning for AWS
+- Automated EC2 bootstrapping with Terraform `user_data`
+- Public cloud deployment on AWS EC2
+- Nginx reverse proxy serving the backend on port 80
+- Backend container bound to localhost behind Nginx
+- SSH access restricted to a trusted public IP
+- Prometheus metrics collection from the Flask backend
+- Grafana dashboard provisioning for visualization
+- Node Exporter metrics collection for host and system visibility
+- Alertmanager integration for alert routing and alert state management
+- Prometheus alert rules for service availability and CPU monitoring
+- Clean project structure for portfolio and production-style presentation
 
 ---
 
@@ -65,14 +72,13 @@ This repository is designed to showcase practical skills in:
 - **Backend:** Flask
 - **Database:** PostgreSQL
 - **Containerization:** Docker
-- **Local Orchestration:** Docker Compose
-- **Container Orchestration:** Kubernetes
+- **Orchestration:** Docker Compose, Kubernetes
 - **CI/CD:** GitHub Actions
 - **Infrastructure as Code:** Terraform
-- **Cloud Platform:** AWS
+- **Cloud Platform:** AWS EC2, Render
 - **Reverse Proxy:** Nginx
-- **Monitoring:** Prometheus, Grafana
-- **Alerting:** Alertmanager
+- **Monitoring:** Prometheus, Grafana, Node Exporter
+- **Alerting:** Alertmanager, Prometheus Alert Rules
 - **Testing:** Pytest
 
 ---
@@ -86,97 +92,247 @@ devops-production-platform/
 │       └── ci-cd.yml
 ├── app/
 │   └── backend/
-│       ├── .dockerignore
-│       ├── Dockerfile
-│       ├── README.md
-│       ├── __init__.py
 │       ├── app.py
 │       ├── config.py
 │       ├── extensions.py
 │       ├── models.py
-│       ├── requirements.txt
 │       ├── routes.py
 │       ├── utils.py
-│       └── tests/
+│       ├── requirements.txt
+│       ├── tests/
+│       │   └── test_app.py
+│       └── __init__.py
 ├── docker/
-├── docs/
+│   └── Dockerfile
 ├── kubernetes/
 │   ├── backend-deployment.yml
-│   ├── backend-service.yml
-│   ├── configmap.yml
-│   ├── hpa.yml
-│   ├── ingress.yml
-│   ├── namespace.yml
-│   ├── postgres-deployment.yml
-│   ├── postgres-pvc.yml
-│   ├── postgres-service.yml
-│   └── secret.yml
+│   └── backend-service.yml
 ├── monitoring/
+│   ├── prometheus.yml
 │   ├── alert.rules.yml
 │   ├── alertmanager.yml
-│   ├── grafana/
-│   │   ├── dashboards/
-│   │   └── provisioning/
-│   └── prometheus.yml
-├── scripts/
+│   └── grafana/
+│       ├── dashboards/
+│       │   └── flask-dashboard.json
+│       └── provisioning/
+│           ├── dashboards/
+│           │   └── dashboard.yml
+│           └── datasources/
+│               └── datasource.yml
 ├── terraform/
 │   ├── bootstrap/
-│   │   ├── .terraform.lock.hcl
 │   │   └── main.tf
-│   ├── .terraform.lock.hcl
 │   ├── backend.tf
+│   ├── provider.tf
+│   ├── variables.tf
 │   ├── main.tf
 │   ├── outputs.tf
-│   ├── provider.tf
-│   ├── terraform.tfvar
-│   ├── terraform.tfvars.example
-│   └── variables.tf
-├── .gitignore
+│   └── terraform.tfvars.example
+├── docs/
+├── scripts/
 ├── docker-compose.yml
-├── LICENSE
-└── README.md
-Architecture Summary
-This project follows a production-style workflow:
-
-Developers push code to GitHub.
-GitHub Actions runs CI checks such as dependency installation, testing, and image build steps.
-Docker images can be built and pushed to a container registry.
-Terraform provisions AWS infrastructure for deployment.
-EC2 instances can be bootstrapped automatically using user_data.
-Nginx can be used as a reverse proxy in front of the Flask backend.
-Prometheus scrapes application and infrastructure metrics.
-Grafana visualizes those metrics through dashboards.
-Alertmanager processes configured alerts.
+├── README.md
+└── .gitignore
+Architecture Diagram
+text
+                        +----------------------+
+                        |    GitHub Repository |
+                        | Source Code & Config |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        | GitHub Actions CI/CD |
+                        | - Install deps       |
+                        | - Run tests          |
+                        | - Start PostgreSQL   |
+                        | - Build Docker image |
+                        | - Push to Docker Hub |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        |     Docker Hub       |
+                        |   Backend Image      |
+                        +----------+-----------+
+                                   |
+                                   v
+                 +---------------------------------------------+
+                 | Terraform-Provisioned AWS Infrastructure    |
+                 | - VPC                                       |
+                 | - Public Subnet                             |
+                 | - Internet Gateway                          |
+                 | - Route Table                               |
+                 | - Security Group                            |
+                 | - EC2 Instance                              |
+                 +-------------------+-------------------------+
+                                     |
+                                     v
+                        +----------------------+
+                        |      EC2 Instance    |
+                        |  Docker via user_data|
+                        |  Nginx reverse proxy |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        | Flask Backend        |
+                        | Bound to 127.0.0.1   |
+                        | Port 5000 internal   |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        |  Prometheus Metrics  |
+                        |  Scrapes /metrics    |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        |   Node Exporter      |
+                        |  System Metrics      |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        | Grafana Dashboards   |
+                        | Visualizes Metrics   |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        |   Alertmanager       |
+                        | Handles Alerts       |
+                        +----------------------+
 CI/CD Workflow
-The GitHub Actions workflow is intended to automate the following tasks:
+The GitHub Actions pipeline automates the following:
 
-check out repository code
-set up the runtime environment
-install dependencies
-run automated tests
-build the backend Docker image
-optionally push the image to a registry
-prepare for deployment workflows
+checks out the repository
+sets up Python
+installs dependencies
+starts a PostgreSQL service for testing
+runs automated tests with pytest
+builds the backend Docker image
+pushes the image to Docker Hub after successful validation
 Workflow file:
 
 text
 .github/workflows/ci-cd.yml
-Infrastructure Provisioning
-Terraform is used to provision AWS infrastructure for deployment.
+AWS Infrastructure Provisioning
+The project uses Terraform to provision AWS infrastructure for deployment. The infrastructure includes:
 
-Depending on the Terraform configuration in this repository, infrastructure may include:
+a custom VPC
+a public subnet
+an internet gateway
+a route table and route table association
+a security group for HTTP access and restricted SSH access
+an EC2 instance for application hosting
+Terraform also uses EC2 user_data to automate instance bootstrapping by:
 
-networking components
-security groups
-compute instances
-remote state configuration
-bootstrap resources for Terraform backend setup
-Main Terraform files:
+installing Docker
+installing Nginx
+enabling and starting required services
+pulling the application image from Docker Hub
+running the Flask backend container automatically on launch
+configuring Nginx as a reverse proxy
+Reverse Proxy and Security Hardening
+The AWS deployment uses Nginx as a reverse proxy in front of the Flask backend.
+
+Security improvements implemented
+public access is served through port 80
+the Flask container is bound to 127.0.0.1:5000
+direct public exposure of backend port 5000 is removed
+SSH access is restricted to a trusted public IP
+This setup better reflects a production-style deployment model by reducing unnecessary public exposure.
+
+Monitoring and Observability
+The platform includes a local monitoring stack using Prometheus, Grafana, and Node Exporter.
+
+Prometheus
+Prometheus scrapes application metrics from the Flask backend through the /metrics endpoint and also scrapes system metrics from Node Exporter.
+
+Grafana
+Grafana is connected to Prometheus as a data source and automatically provisions a dashboard for backend and system monitoring.
+
+Node Exporter
+Node Exporter provides system-level metrics such as:
+
+CPU usage
+memory usage
+network traffic
+node availability
+The monitoring setup provides visibility into:
+
+backend availability
+HTTP request rate
+HTTP request count
+application-level Prometheus metrics
+host-level health and usage data
+Alerting
+The platform includes Alertmanager and Prometheus alert rules for basic operational alerting.
+
+Configured alert rules include:
+
+FlaskBackendDown — triggers when the backend is unreachable
+NodeExporterDown — triggers when Node Exporter becomes unavailable
+HighCPUUsage — triggers when CPU usage remains above threshold
+Prometheus evaluates alert rules and sends firing alerts to Alertmanager for handling.
+
+How It Works
+Code is pushed to GitHub.
+GitHub Actions triggers the CI/CD pipeline automatically.
+The backend application is tested using PostgreSQL and pytest.
+The Docker image is built and pushed to Docker Hub.
+Terraform provisions AWS infrastructure for deployment.
+The EC2 instance launches and runs bootstrap commands through user_data.
+Docker and Nginx are installed automatically on the instance.
+The backend image is pulled from Docker Hub and started automatically.
+Nginx proxies public HTTP traffic to the backend running locally on port 5000.
+Prometheus collects metrics from the backend and Node Exporter.
+Grafana visualizes application and system metrics through provisioned dashboards.
+Prometheus evaluates alert rules and sends firing alerts to Alertmanager.
+Installation and Setup
+1. Clone the repository
+bash
+git clone https://github.com/Alibras257/devops-production-platform.git
+cd devops-production-platform
+2. Set up environment variables
+Create a .env file if needed for local development and configure your database connection settings.
+
+3. Install backend dependencies
+bash
+pip install -r app/backend/requirements.txt
+4. Run the backend locally
+bash
+cd app/backend
+python app.py
+The app should be available at:
 
 text
-terraform/
-terraform/bootstrap/
-Typical Terraform workflow:
+http://localhost:5000
+Run with Docker
+Build the Docker image
+bash
+docker build -t flask-backend ./app/backend
+Run the container
+bash
+docker run -p 5000:5000 flask-backend
+Run with Docker Compose
+To start the backend, PostgreSQL, Prometheus, Grafana, Node Exporter, and Alertmanager together:
+
+bash
+docker-compose up --build
+To stop the services:
+
+bash
+docker-compose down
+Running Tests
+Run tests locally with:
+
+bash
+pytest app/backend/tests -v
+Terraform Usage
+To provision the AWS infrastructure:
 
 bash
 cd terraform
@@ -184,164 +340,130 @@ terraform init
 terraform validate
 terraform plan
 terraform apply
-If you are using bootstrap resources for remote state:
+Terraform outputs the public IP of the EC2 instance after successful deployment.
+
+To replace the EC2 instance and re-run automated provisioning:
+
+bash
+terraform apply -replace="aws_instance.devops_server"
+Remote Terraform State
+The project uses an S3 backend for Terraform state storage and supports safer state handling through bootstrap infrastructure.
+
+Bootstrap resources include:
+
+S3 bucket for Terraform state
+remote backend configuration
+Bootstrap example:
 
 bash
 cd terraform/bootstrap
 terraform init
-terraform plan
 terraform apply
-Kubernetes Deployment
-Kubernetes manifests are included for deploying the application and supporting services.
+Deployment
+This project supports multiple deployment approaches, including local containerized development, cloud deployment, and infrastructure automation.
 
-Included resources currently cover:
+Current deployment targets include:
 
-namespace
-backend deployment
-backend service
-ingress
-ConfigMap
-Secret
-Horizontal Pod Autoscaler
-PostgreSQL deployment
-PostgreSQL service
-PostgreSQL persistent volume claim
-Apply all manifests with:
+Render for managed cloud hosting
+AWS EC2 provisioned with Terraform for infrastructure-level deployment
+The AWS deployment uses Terraform to provision infrastructure and EC2 user_data to install Docker, configure Nginx, and start the backend container automatically.
 
-bash
-kubectl apply -f kubernetes/
-Monitoring and Alerting
-The monitoring stack includes:
-
-Prometheus for metrics scraping
-Grafana for dashboards and visualization
-Alertmanager for alert routing and handling
-The repository also includes Prometheus alert rules and Grafana provisioning files.
-
-Monitoring files
-text
-monitoring/prometheus.yml
-monitoring/alert.rules.yml
-monitoring/alertmanager.yml
-monitoring/grafana/
-Example local endpoints
-Prometheus: http://localhost:9090
-Grafana: http://localhost:3000
-Alertmanager: http://localhost:9093
-Default Grafana login
-text
-Username: admin
-Password: admin
-Change default credentials before using this in any real environment.
-
-Local Development Setup
-1. Clone the repository
-bash
-git clone https://github.com/Alibras257/devops-production-platform.git
-cd devops-production-platform
-2. Install backend dependencies
-bash
-pip install -r app/backend/requirements.txt
-3. Run the backend locally
-bash
-cd app/backend
-python app.py
-The application should be available at:
-
-text
-http://localhost:5000
-Run with Docker
-Build the backend image:
-
-bash
-docker build -t flask-backend ./app/backend
-Run the container:
-
-bash
-docker run -p 5000:5000 flask-backend
-Run with Docker Compose
-To start the local stack:
-
-bash
-docker compose up --build
-To stop the services:
-
-bash
-docker compose down
-If your environment still uses the legacy command, docker-compose up --build will also work.
-
-Running Tests
-Run tests locally with:
-
-bash
-pytest app/backend/tests -v
-Deployment Notes
-This project supports multiple deployment-oriented workflows, including:
-
-local containerized development
-AWS infrastructure provisioning with Terraform
-Kubernetes-based deployment using manifests
-If your Terraform configuration provisions an EC2 instance, the backend can be started automatically through EC2 bootstrap logic such as user_data, and Nginx can be configured as a reverse proxy for public access.
-
-Example public access pattern:
+Access pattern
+public access:
 
 text
 http://EC2_PUBLIC_IP
-Example internal backend binding:
+internal backend binding:
 
 text
 127.0.0.1:5000
-API Endpoints
-Current backend endpoints are expected to include:
+Note: EC2 public IPs may change if the instance is replaced or recreated.
 
-/ — application status
-/users — list or create users
-/users/<id> — retrieve or update a user
+Monitoring Usage
+Prometheus UI
+text
+http://localhost:9090
+Grafana UI
+text
+http://localhost:3000
+Default Grafana login:
+
+text
+Username: admin
+Password: admin
+Alertmanager UI
+text
+http://localhost:9093
+Provisioned Dashboard
+Grafana automatically loads:
+
+Flask Backend Monitoring Dashboard
+Kubernetes Deployment
+Kubernetes manifests are included for backend deployment and service exposure.
+
+Apply them with:
+
+bash
+kubectl apply -f kubernetes/
+Included manifests:
+
+backend-deployment.yml
+backend-service.yml
+API Endpoints
+Current backend endpoints include:
+
+/ — application status response
+/users — list users / create user
+/users/<id> — fetch or update a user
 /metrics — Prometheus metrics endpoint
 Example status response:
 
 json
 {"status":"connected to app layer"}
 Why This Project Matters
-This project is useful as a portfolio and learning project because it demonstrates how to:
+This project highlights essential DevOps and cloud engineering skills in a practical, portfolio-ready format:
 
-build and containerize a backend application
-integrate application and database services
-automate testing in CI/CD
-provision cloud infrastructure with Terraform
-prepare workloads for Kubernetes deployment
-introduce observability with Prometheus and Grafana
-add alerting with Alertmanager
-organize a clean, production-style DevOps repository
-It is suitable for showcasing skills relevant to:
+containerizing backend applications with Docker
+integrating application and database services
+automating testing and validation in CI/CD
+provisioning cloud infrastructure with Terraform
+automating EC2 configuration with user_data
+deploying containerized applications to AWS
+securing application access with Nginx and restricted SSH rules
+exposing observability data through Prometheus metrics
+collecting host-level metrics with Node Exporter
+visualizing service health and usage through Grafana dashboards
+implementing operational alerting with Alertmanager
+preparing services for Kubernetes-based deployment
+maintaining a clean and reproducible development workflow
+It is suitable for showcasing DevOps, Cloud, Platform Engineering, SRE, and Backend engineering capabilities.
 
-DevOps Engineering
-Cloud Engineering
-Platform Engineering
-Site Reliability Engineering
-Backend Engineering
 Future Improvements
-Potential next enhancements include:
+Potential next enhancements:
 
+configure external alert receivers such as email or Slack
 add HTTPS and domain configuration
-integrate external alert receivers such as Slack or email
-improve secrets management
-add multi-environment deployment support
+convert trusted SSH CIDR into a Terraform variable
 package Kubernetes resources with Helm
 implement GitOps with Argo CD
 expand automated test coverage
-deploy to a managed Kubernetes platform such as EKS
-add vulnerability scanning for containers and infrastructure
+deploy to a managed Kubernetes service such as EKS
 Screenshots
-Add screenshots or architecture diagrams in the docs/ folder and reference them here.
+Suggested screenshots to include:
 
-Example:
+application running on AWS EC2 through Nginx
+GitHub Actions workflow success page
+Prometheus targets page
+Grafana dashboard
+Alertmanager alerts page
+You can store screenshots in:
 
-md
-![Architecture](docs/architecture.png)
+text
+docs/screenshots/
 Author
 Ibraheem Aloyinlapa
 GitHub: Alibras257
 
 License
 This project is for educational and portfolio purposes.
+
