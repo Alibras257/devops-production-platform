@@ -1,33 +1,22 @@
-name: devops-production-platform
-
 services:
   backend:
     build:
       context: ./app/backend
-      dockerfile: Dockerfile
     container_name: flask-backend
-    restart: unless-stopped
     ports:
       - "5000:5000"
     environment:
-      FLASK_ENV: production
+      FLASK_ENV: development
       DATABASE_URL: postgresql://devuser:devpass@postgres:5432/devdb
     depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5000/health').read()\""]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
+      - postgres
     networks:
       - devops-network
 
   postgres:
     image: postgres:16
     container_name: postgres-db
-    restart: unless-stopped
+    restart: always
     environment:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpass
@@ -36,25 +25,21 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U devuser -d devdb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     networks:
       - devops-network
 
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-    restart: unless-stopped
+    restart: always
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./monitoring/alert.rules.yml:/etc/prometheus/alert.rules.yml:ro
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/alert.rules.yml:/etc/prometheus/alert.rules.yml
     depends_on:
       - backend
+      - node-exporter
       - alertmanager
     networks:
       - devops-network
@@ -62,23 +47,23 @@ services:
   alertmanager:
     image: prom/alertmanager:latest
     container_name: alertmanager
-    restart: unless-stopped
+    restart: always
     ports:
       - "9093:9093"
     volumes:
-      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./monitoring/secrets/gmail_app_password.txt:/etc/alertmanager/gmail_app_password.txt:ro
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
     networks:
       - devops-network
 
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
-    restart: unless-stopped
+    restart: always
     ports:
       - "3000:3000"
-    environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
       - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
@@ -89,9 +74,17 @@ services:
     networks:
       - devops-network
 
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: always
+    ports:
+      - "9100:9100"
+    networks:
+      - devops-network
+
 networks:
   devops-network:
-    driver: bridge
 
 volumes:
   postgres_data:

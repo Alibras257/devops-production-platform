@@ -1,13 +1,23 @@
 global:
   resolve_timeout: 5m
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'mydevopsalerts@gmail.com'
+  smtp_auth_username: 'mydevopsalerts@gmail.com'
+  smtp_auth_password_file: '/etc/alertmanager/gmail_app_password.txt'
+  smtp_require_tls: true
 
 route:
-  receiver: "default-receiver"
+  receiver: "gmail-alerts"
   group_wait: 10s
   group_interval: 30s
   repeat_interval: 1h
 
 receivers:
-  - name: "default-receiver"
-
-inhibit_rules: []
+  - name: "gmail-alerts"
+    email_configs:
+      - to: 'alibras2026@gmail.com'
+        from: 'mydevopsalerts@gmail.com'
+        smarthost: 'smtp.gmail.com:587'
+        auth_username: 'mydevopsalerts@gmail.com'
+        auth_password_file: '/etc/alertmanager/gmail_app_password.txt'
+        require_tls: true

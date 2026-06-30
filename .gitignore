@@ -6,28 +6,24 @@ crash.log
 terraform.tfvars
 *.pem
 
+# Terraform lock files
+# Keep these tracked if desired for provider version consistency
+# .terraform.lock.hcl
+
 # Python
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.pytest_cache/
 .venv/
 venv/
-env/
 
 # Environment files
 .env
 .env.*
+.env.alerting
 
 # OS / Editor
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-
-# Docker
-*.log
-
-# Kubernetes
-kubeconfig
+monitoring/secrets/
