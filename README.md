@@ -68,6 +68,7 @@ The local platform is composed of the following services:
 ├── docker-compose.yml
 ├── .env.example
 └── README.md
+
 Features
 Containerized Flask backend with PostgreSQL
 Local multi-container orchestration using Docker Compose
@@ -319,6 +320,6 @@ License
 Add a license file if you want others to reuse or reference your project more formally.
 
 Author
-Ali Bras
+Ibraheem Aloyinlapa
 
 GitHub: Alibras257
