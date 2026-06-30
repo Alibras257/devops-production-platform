@@ -8,6 +8,7 @@ global:
 
 route:
   receiver: "gmail-alerts"
+  group_by: ['alertname', 'severity', 'service']
   group_wait: 10s
   group_interval: 30s
   repeat_interval: 1h
@@ -16,8 +17,4 @@ receivers:
   - name: "gmail-alerts"
     email_configs:
       - to: 'alibras2026@gmail.com'
-        from: 'mydevopsalerts@gmail.com'
-        smarthost: 'smtp.gmail.com:587'
-        auth_username: 'mydevopsalerts@gmail.com'
-        auth_password_file: '/etc/alertmanager/gmail_app_password.txt'
-        require_tls: true
+        send_resolved: true

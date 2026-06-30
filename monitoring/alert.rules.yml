@@ -6,33 +6,47 @@ groups:
         for: 1m
         labels:
           severity: critical
+          service: backend
         annotations:
           summary: "Flask backend is down"
-          description: "The Flask backend target has been unreachable for more than 1 minute."
+          description: "The Flask backend target on {{ $labels.instance }} has been unreachable for more than 1 minute."
 
       - alert: NodeExporterDown
         expr: up{job="node-exporter"} == 0
         for: 1m
         labels:
           severity: warning
+          service: monitoring
         annotations:
           summary: "Node exporter is down"
-          description: "The node-exporter target has been unreachable for more than 1 minute."
+          description: "The node-exporter target on {{ $labels.instance }} has been unreachable for more than 1 minute."
 
-      - alert: PrometheusTargetMissing
+      - alert: PrometheusDown
         expr: up{job="prometheus"} == 0
         for: 1m
         labels:
-          severity: warning
+          severity: critical
+          service: monitoring
         annotations:
-          summary: "Prometheus target is down"
-          description: "Prometheus has been unreachable for more than 1 minute."
+          summary: "Prometheus is down"
+          description: "The Prometheus target on {{ $labels.instance }} has been unreachable for more than 1 minute."
+
+      - alert: AlertmanagerDown
+        expr: up{job="alertmanager"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: monitoring
+        annotations:
+          summary: "Alertmanager is down"
+          description: "The Alertmanager target on {{ $labels.instance }} has been unreachable for more than 1 minute."
 
       - alert: HighCPUUsage
         expr: (100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100)) > 80
         for: 2m
         labels:
           severity: warning
+          service: infrastructure
         annotations:
           summary: "High CPU usage detected"
           description: "CPU usage on {{ $labels.instance }} has been above 80% for more than 2 minutes."

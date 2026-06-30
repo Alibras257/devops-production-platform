@@ -1,29 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Monitoring secrets
+monitoring/secrets/
+
 # Terraform
 .terraform/
 *.tfstate
 *.tfstate.*
 crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 terraform.tfvars
-*.pem
+terraform.tfvars.json
 
-# Terraform lock files
-# Keep these tracked if desired for provider version consistency
-# .terraform.lock.hcl
+# Docker
+*.pid
 
-# Python
-__pycache__/
-*.pyc
-.venv/
-venv/
-
-# Environment files
-.env
-.env.*
-.env.alerting
-
-# OS / Editor
+# OS / Editor files
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-monitoring/secrets/
+
+# Grafana local data
+grafana_data/
