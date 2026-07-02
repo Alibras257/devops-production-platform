@@ -18,35 +18,42 @@
 
 # DevOps Production Platform
 
-A production-style DevOps project that demonstrates how to build, containerize, monitor, alert on, and automate deployment workflows for a Flask backend using Docker, PostgreSQL, Prometheus, Alertmanager, Grafana, GitHub Actions, Terraform, and AWS.
+A production-style DevOps project that demonstrates how to build, containerize, monitor, alert on, and automate deployment workflows for a Flask backend using Docker, PostgreSQL, Prometheus, Alertmanager, Grafana, GitHub Actions, Terraform, Kubernetes, and AWS.
 
 ## Project Overview
 
-This repository is designed to showcase practical DevOps skills across application packaging, infrastructure automation, observability, and CI/CD.
+This repository showcases practical DevOps skills across:
+
+- application containerization
+- infrastructure automation
+- observability and alerting
+- CI/CD automation
+- cloud and Kubernetes deployment structure
 
 The platform includes:
 
-- A Flask backend application
+- a Flask backend application
 - PostgreSQL as the application database
-- Docker Compose for multi-service local orchestration
-- Prometheus for metrics scraping and alert evaluation
+- Docker Compose for local multi-service orchestration
+- Prometheus for metrics collection and alert evaluation
 - Alertmanager for email notifications
 - Grafana for dashboards and visualization
 - Node Exporter for infrastructure metrics
-- GitHub Actions for CI/CD automation
+- GitHub Actions for testing and Docker image publishing
 - Terraform for infrastructure-as-code
-- AWS integration for cloud deployment workflows
+- Kubernetes manifests for container orchestration deployment structure
+- AWS support for cloud infrastructure workflows
 
 ## Architecture
 
-The local platform is composed of the following services:
+The local stack contains the following services:
 
 - **backend** – Flask application exposing application endpoints and Prometheus metrics
 - **postgres** – PostgreSQL database for backend persistence
 - **prometheus** – scrapes metrics and evaluates alert rules
 - **alertmanager** – sends email notifications when alerts fire
 - **grafana** – visualizes metrics and dashboards
-- **node-exporter** – exposes system metrics for infrastructure monitoring
+- **node-exporter** – exposes infrastructure metrics
 
 ## Repository Structure
 
@@ -56,6 +63,9 @@ The local platform is composed of the following services:
 │   └── ci-cd.yml
 ├── app/
 │   └── backend/
+├── docs/
+│   └── screenshots/
+├── kubernetes/
 ├── monitoring/
 │   ├── alert.rules.yml
 │   ├── alertmanager.yml
@@ -63,21 +73,24 @@ The local platform is composed of the following services:
 │   ├── grafana/
 │   │   ├── dashboards/
 │   │   └── provisioning/
-│   └── secrets/            # local only, not committed
+│   └── secrets/                  # local only, not committed
 ├── terraform/
 ├── docker-compose.yml
 ├── .env.example
+├── LICENSE
 └── README.md
+
 
 Features
 Containerized Flask backend with PostgreSQL
 Local multi-container orchestration using Docker Compose
-Metrics collection with Prometheus
+Monitoring with Prometheus
 Email alerting with Alertmanager and Gmail SMTP
 Dashboards with Grafana
-Infrastructure monitoring with Node Exporter
+Infrastructure metrics with Node Exporter
 Automated testing and Docker image publishing with GitHub Actions
-Terraform-based infrastructure provisioning support
+Terraform-ready infrastructure-as-code structure
+Kubernetes manifest support
 Public portfolio-ready DevOps project structure
 Tech Stack
 Backend: Flask, Python
@@ -88,6 +101,7 @@ Alerting: Alertmanager, Gmail SMTP
 Visualization: Grafana
 CI/CD: GitHub Actions
 Infrastructure as Code: Terraform
+Container Orchestration: Kubernetes
 Cloud: AWS
 Prerequisites
 Before running the project locally, ensure you have:
@@ -95,7 +109,7 @@ Before running the project locally, ensure you have:
 Docker
 Docker Compose
 Git
-A Gmail account with:
+a Gmail account with:
 2-Step Verification enabled
 an App Password created for SMTP alerting
 Local Setup
@@ -110,7 +124,7 @@ env
 POSTGRES_USER=devuser
 POSTGRES_PASSWORD=devpass
 POSTGRES_DB=devdb
-You can also copy from the example file:
+Or copy from the example file:
 
 bash
 cp .env.example .env
@@ -120,7 +134,7 @@ Create the Gmail App Password file used by Alertmanager:
 bash
 mkdir -p monitoring/secrets
 echo "YOUR_GMAIL_APP_PASSWORD" > monitoring/secrets/gmail_app_password.txt
-Use a Gmail App Password, not your regular Gmail account password.
+Use a Gmail App Password, not your normal Gmail account password.
 
 4. Start the platform
 bash
@@ -134,23 +148,20 @@ Alertmanager: http://localhost:9093
 Grafana: http://localhost:3000
 Node Exporter metrics: http://localhost:9100/metrics
 Monitoring and Alerting
-Prometheus scrape targets
 Prometheus is configured to scrape:
 
 Flask backend metrics
 Node Exporter metrics
 Prometheus self-metrics
 Alertmanager metrics
-Alert rules
-The platform includes alerts such as:
+Alert rules include:
 
 FlaskBackendDown
 NodeExporterDown
 PrometheusDown
 AlertmanagerDown
 HighCPUUsage
-Alert delivery
-Alertmanager sends email notifications using Gmail SMTP.
+Alertmanager is configured to send email notifications using Gmail SMTP.
 
 How to Test Alerts
 To force a backend-down alert:
@@ -169,67 +180,118 @@ To restore the backend:
 
 bash
 docker start flask-backend
-If send_resolved: true is enabled in Alertmanager, you should also receive a recovery email when the service comes back up.
+If send_resolved: true is enabled in Alertmanager, you should also receive a recovery email.
 
 Grafana
-Grafana is included for dashboard visualization.
+Grafana is included for dashboard visualization and observability.
 
 Typical usage includes:
 
 infrastructure monitoring dashboards
-application health dashboards
+backend service health dashboards
 Prometheus datasource integration
-viewing metrics over time for CPU and service availability
+tracking metrics over time
 Default local URL:
 
 text
 http://localhost:3000
-If you provision dashboards and datasources through the monitoring/grafana/ directory, Grafana will automatically load them on startup.
+If dashboards and datasources are provisioned through the monitoring/grafana/ directory, Grafana will load them automatically on startup.
 
 CI/CD Pipeline
-GitHub Actions is used to automate testing and Docker image builds.
+GitHub Actions is used to automate testing and Docker image publishing.
 
 Workflow behavior
 On:
 
 push to main
 pull requests targeting main
-The workflow:
+The pipeline:
 
-Starts a PostgreSQL service in GitHub Actions
-Installs Python dependencies
-Runs backend tests
-Builds the backend Docker image
-Pushes the image to Docker Hub on successful push to main
-Expected GitHub Secrets
+starts a PostgreSQL service in GitHub Actions
+installs Python dependencies
+runs backend tests
+builds the backend Docker image
+pushes the image to Docker Hub on successful push to main
+Required GitHub Secrets
 To publish Docker images, configure these repository secrets:
 
 DOCKERHUB_USERNAME
 DOCKERHUB_TOKEN
 Terraform
-The repository includes a Terraform directory for infrastructure-as-code workflows.
+The repository includes Terraform configuration for infrastructure-as-code workflows.
 
 Typical Terraform usage may include:
 
 provisioning AWS infrastructure
-networking and compute resources
-deployment support for the application stack
-Do not commit real terraform.tfvars files or cloud secrets.
+networking resources
+compute resources
+deployment support for application services
+Do not commit real terraform.tfvars files or cloud credentials.
+
+Kubernetes
+The repository also includes Kubernetes manifests for deployment structure and orchestration practice.
+
+These manifests may include resources such as:
+
+deployments
+services
+ingress
+configmaps
+secrets
+autoscaling configuration
+persistent volume claims
+If you use Kubernetes secrets, keep real values out of public repositories. Use example manifests or placeholders instead.
+
+Screenshots
+Add screenshots to strengthen the project presentation.
+
+Recommended location:
+
+text
+docs/screenshots/
+Recommended screenshots:
+
+Prometheus targets
+Prometheus alerts
+Alertmanager UI
+Grafana dashboard
+received email alert
+GitHub Actions successful workflow run
+Prometheus Targets
+Prometheus Targets
+
+Prometheus Alerts
+Prometheus Alerts
+
+Alertmanager UI
+Alertmanager UI
+
+Grafana Dashboard
+Grafana Dashboard
+
+Email Alert
+Email Alert
+
+GitHub Actions Success
+GitHub Actions Success
 
 Security Notes
 This repository is structured to avoid committing secrets.
 
-Secrets that should never be committed
+Do not commit
 .env
 monitoring/secrets/gmail_app_password.txt
 terraform.tfvars
 cloud credentials
-API keys or SMTP passwords
+API keys
+real SMTP passwords
+real Kubernetes secret values
 Secret handling used in this project
 local environment variables are stored in .env
-Gmail SMTP password is mounted from a local secret file
+Gmail SMTP authentication uses a mounted local secret file
+example configuration files are safe to commit
 ignored files are managed through .gitignore
-If a secret was ever accidentally committed, it should be rotated immediately.
+If any secret was ever accidentally committed, it should be rotated immediately.
 
 Recommended Verification Steps
 After setup, verify the following:
@@ -273,51 +335,40 @@ docker-compose up --build
 View Alertmanager logs
 bash
 docker logs alertmanager
-Stop backend to trigger alert
+Trigger a backend-down alert
 bash
 docker stop flask-backend
-Start backend again
+Restore backend
 bash
 docker start flask-backend
-Screenshots
-You can strengthen this project further by adding screenshots such as:
-
-Prometheus targets page
-Prometheus alerts page
-Alertmanager active alerts
-Grafana dashboard
-received email alert
-GitHub Actions successful workflow run
-You can place them in a folder such as:
-
-text
-docs/screenshots/
 Skills Demonstrated
 This project demonstrates:
 
 Docker containerization
 multi-service orchestration
 service networking
-secret management basics
-metrics collection and observability
+environment and secret management basics
+infrastructure monitoring
 alerting and incident notification
+dashboard visualization
 CI/CD automation
-infrastructure-as-code structure
-DevOps portfolio project organization
+Terraform project structure
+Kubernetes deployment structure
+portfolio-grade DevOps documentation
 Future Improvements
 Potential next enhancements:
 
 add Nginx reverse proxy
-add HTTPS with TLS
+add HTTPS/TLS
 improve backend health checks
 add memory, disk, and container restart alerts
 add linting and security scanning to CI
 add Terraform validation in CI
-deploy the stack to AWS
-add Kubernetes manifests or Helm charts
-use managed secret stores for production
+add full AWS deployment automation
+add Kubernetes deployment guide
+use managed secret stores in production environments
 License
-Add a license file if you want others to reuse or reference your project more formally.
+This project is licensed under the MIT License.
 
 Author
 Ibraheem Aloyinlapa
