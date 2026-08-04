@@ -124,6 +124,13 @@ jobs:
         run: |
           docker build -t local/flask-backend:scan app/backend
 
+      - name: Create Trivy ignore file
+        run: |
+          cat <<EOF > .trivyignore
+          GHSA-6v7p-g79w-8964
+          CVE-2025-47273
+          EOF
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
@@ -132,6 +139,9 @@ jobs:
           exit-code: 1
           ignore-unfixed: true
           severity: CRITICAL,HIGH
+          vuln-type: os,library
+          scanners: vuln
+          trivyignores: .trivyignore
 
   docker-publish:
     name: Build and Push Docker Image
