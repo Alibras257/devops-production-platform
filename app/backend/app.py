@@ -1,13 +1,12 @@
 import os
 import time
 
+from extensions import db
 from flask import Flask, jsonify, request
+from models import User
 from prometheus_flask_exporter import PrometheusMetrics
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError, OperationalError
-
-from extensions import db
-from models import User
 
 
 def create_app():
@@ -67,22 +66,28 @@ def create_app():
     def ready():
         try:
             db.session.execute(text("SELECT 1"))
-            return jsonify(
-                {
-                    "status": "ready",
-                    "service": "flask-backend",
-                    "database": "connected",
-                }
-            ), 200
+            return (
+                jsonify(
+                    {
+                        "status": "ready",
+                        "service": "flask-backend",
+                        "database": "connected",
+                    }
+                ),
+                200,
+            )
         except Exception:
             app.logger.exception("Readiness check failed")
-            return jsonify(
-                {
-                    "status": "not ready",
-                    "service": "flask-backend",
-                    "database": "unavailable",
-                }
-            ), 503
+            return (
+                jsonify(
+                    {
+                        "status": "not ready",
+                        "service": "flask-backend",
+                        "database": "unavailable",
+                    }
+                ),
+                503,
+            )
 
     @app.route("/users", methods=["GET"])
     def get_users():
