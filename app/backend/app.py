@@ -3,6 +3,7 @@ import time
 
 from flask import Flask, jsonify, request
 from prometheus_flask_exporter import PrometheusMetrics
+from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError, OperationalError
 
 from extensions import db
@@ -12,10 +13,21 @@ from models import User
 def create_app():
     app = Flask(__name__)
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
-        "DATABASE_URL",
-        "postgresql://devuser:devpass@localhost:5432/devdb",
-    )
+    database_url = os.getenv("DATABASE_URL")
+
+    if not database_url:
+        postgres_user = os.getenv("POSTGRES_USER", "devuser")
+        postgres_password = os.getenv("POSTGRES_PASSWORD", "devpass")
+        postgres_db = os.getenv("POSTGRES_DB", "devdb")
+        postgres_host = os.getenv("POSTGRES_HOST", "localhost")
+        postgres_port = os.getenv("POSTGRES_PORT", "5432")
+
+        database_url = (
+            f"postgresql://{postgres_user}:{postgres_password}"
+            f"@{postgres_host}:{postgres_port}/{postgres_db}"
+        )
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
@@ -30,6 +42,8 @@ def create_app():
             except OperationalError:
                 app.logger.warning(f"DB not ready, retrying... ({i + 1}/10)")
                 time.sleep(2)
+        else:
+            app.logger.error("Database was not ready after retries")
 
     @app.route("/")
     def home():
@@ -38,7 +52,7 @@ def create_app():
                 "status": "connected to app layer",
                 "service": "devops-production-platform",
             }
-        )
+        ), 200
 
     @app.route("/health")
     def health():
@@ -49,6 +63,27 @@ def create_app():
             }
         ), 200
 
+    @app.route("/ready")
+    def ready():
+        try:
+            db.session.execute(text("SELECT 1"))
+            return jsonify(
+                {
+                    "status": "ready",
+                    "service": "flask-backend",
+                    "database": "connected",
+                }
+            ), 200
+        except Exception:
+            app.logger.exception("Readiness check failed")
+            return jsonify(
+                {
+                    "status": "not ready",
+                    "service": "flask-backend",
+                    "database": "unavailable",
+                }
+            ), 503
+
     @app.route("/users", methods=["GET"])
     def get_users():
         users = User.query.all()
@@ -57,7 +92,7 @@ def create_app():
                 "count": len(users),
                 "users": [user.to_dict() for user in users],
             }
-        )
+        ), 200
 
     @app.route("/users/<int:user_id>", methods=["GET"])
     def get_user(user_id):
@@ -66,7 +101,7 @@ def create_app():
         if not user:
             return jsonify({"error": "User not found"}), 404
 
-        return jsonify(user.to_dict())
+        return jsonify(user.to_dict()), 200
 
     @app.route("/users", methods=["POST"])
     def create_user():
@@ -115,6 +150,9 @@ def create_app():
 
         data = request.get_json()
 
+        if not data:
+            return jsonify({"error": "No JSON body provided"}), 400
+
         if "name" in data:
             user.name = data["name"]
 
@@ -129,7 +167,7 @@ def create_app():
                     "message": "User updated successfully",
                     "user": user.to_dict(),
                 }
-            )
+            ), 200
 
         except IntegrityError:
             db.session.rollback()
