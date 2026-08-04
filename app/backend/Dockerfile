@@ -12,8 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY requirements.txt .
 
-RUN python -m pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --no-cache-dir --upgrade \
+    pip \
+    setuptools>=78.1.1 \
+    wheel && \
+    python -m pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
