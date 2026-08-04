@@ -125,7 +125,7 @@ jobs:
           docker build -t local/flask-backend:scan app/backend
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: local/flask-backend:scan
           format: table
