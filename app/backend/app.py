@@ -33,21 +33,27 @@ def create_app():
 
     @app.route("/")
     def home():
-        return jsonify(
-            {
-                "status": "connected to app layer",
-                "service": "devops-production-platform",
-            }
-        ), 200
+        return (
+            jsonify(
+                {
+                    "status": "connected to app layer",
+                    "service": "devops-production-platform",
+                }
+            ),
+            200,
+        )
 
     @app.route("/health")
     def health():
-        return jsonify(
-            {
-                "status": "healthy",
-                "service": "flask-backend",
-            }
-        ), 200
+        return (
+            jsonify(
+                {
+                    "status": "healthy",
+                    "service": "flask-backend",
+                }
+            ),
+            200,
+        )
 
     @app.route("/ready")
     def ready():
@@ -79,12 +85,15 @@ def create_app():
     @app.route("/users", methods=["GET"])
     def get_users():
         users = User.query.all()
-        return jsonify(
-            {
-                "count": len(users),
-                "users": [user.to_dict() for user in users],
-            }
-        ), 200
+        return (
+            jsonify(
+                {
+                    "count": len(users),
+                    "users": [user.to_dict() for user in users],
+                }
+            ),
+            200,
+        )
 
     @app.route("/users/<int:user_id>", methods=["GET"])
     def get_user(user_id):
@@ -154,12 +163,15 @@ def create_app():
         try:
             db.session.commit()
 
-            return jsonify(
-                {
-                    "message": "User updated successfully",
-                    "user": user.to_dict(),
-                }
-            ), 200
+            return (
+                jsonify(
+                    {
+                        "message": "User updated successfully",
+                        "user": user.to_dict(),
+                    }
+                ),
+                200,
+            )
 
         except IntegrityError:
             db.session.rollback()
