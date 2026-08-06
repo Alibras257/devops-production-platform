@@ -1,12 +1,11 @@
 import os
-import time
 
 from extensions import db
 from flask import Flask, jsonify, request
 from models import User
 from prometheus_flask_exporter import PrometheusMetrics
 from sqlalchemy import text
-from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy.exc import IntegrityError
 
 
 def create_app():
@@ -32,41 +31,23 @@ def create_app():
     db.init_app(app)
     PrometheusMetrics(app)
 
-    with app.app_context():
-        for i in range(10):
-            try:
-                db.create_all()
-                app.logger.info("Database connected successfully")
-                break
-            except OperationalError:
-                app.logger.warning(f"DB not ready, retrying... ({i + 1}/10)")
-                time.sleep(2)
-        else:
-            app.logger.error("Database was not ready after retries")
-
     @app.route("/")
     def home():
-        return (
-            jsonify(
-                {
-                    "status": "connected to app layer",
-                    "service": "devops-production-platform",
-                }
-            ),
-            200,
-        )
+        return jsonify(
+            {
+                "status": "connected to app layer",
+                "service": "devops-production-platform",
+            }
+        ), 200
 
     @app.route("/health")
     def health():
-        return (
-            jsonify(
-                {
-                    "status": "healthy",
-                    "service": "flask-backend",
-                }
-            ),
-            200,
-        )
+        return jsonify(
+            {
+                "status": "healthy",
+                "service": "flask-backend",
+            }
+        ), 200
 
     @app.route("/ready")
     def ready():
@@ -98,15 +79,12 @@ def create_app():
     @app.route("/users", methods=["GET"])
     def get_users():
         users = User.query.all()
-        return (
-            jsonify(
-                {
-                    "count": len(users),
-                    "users": [user.to_dict() for user in users],
-                }
-            ),
-            200,
-        )
+        return jsonify(
+            {
+                "count": len(users),
+                "users": [user.to_dict() for user in users],
+            }
+        ), 200
 
     @app.route("/users/<int:user_id>", methods=["GET"])
     def get_user(user_id):
@@ -176,15 +154,12 @@ def create_app():
         try:
             db.session.commit()
 
-            return (
-                jsonify(
-                    {
-                        "message": "User updated successfully",
-                        "user": user.to_dict(),
-                    }
-                ),
-                200,
-            )
+            return jsonify(
+                {
+                    "message": "User updated successfully",
+                    "user": user.to_dict(),
+                }
+            ), 200
 
         except IntegrityError:
             db.session.rollback()
