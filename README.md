@@ -1,68 +1,88 @@
 # DevOps Production Platform
 
-![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)
-![Flask](https://img.shields.io/badge/Flask-Backend-black?logo=flask)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue?logo=postgresql)
-![Docker](https://img.shields.io/badge/Docker-Containerized-blue?logo=docker)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestration-326CE5?logo=kubernetes)
-![Terraform](https://img.shields.io/badge/Terraform-IaC-844FBA?logo=terraform)
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI/CD-2088FF?logo=github-actions)
-![AWS](https://img.shields.io/badge/AWS-EC2-orange?logo=amazon-aws)
-![Nginx](https://img.shields.io/badge/Nginx-Reverse_Proxy-009639?logo=nginx)
-![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?logo=prometheus)
-![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?logo=grafana)
-![Alertmanager](https://img.shields.io/badge/Alertmanager-Alerting-orange)
-![Node_Exporter](https://img.shields.io/badge/Node_Exporter-System_Metrics-5A5A5A)
-![Render](https://img.shields.io/badge/Render-Deployed-46E3B7?logo=render)
-![License](https://img.shields.io/badge/License-Educational-lightgrey)
+[![CI/CD Pipeline](https://github.com/Alibras257/devops-production-platform/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Alibras257/devops-production-platform/actions/workflows/ci-cd.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED.svg)](https://www.docker.com/)
+[![Terraform](https://img.shields.io/badge/Terraform-Validated-7B42BC.svg)](https://www.terraform.io/)
+[![AWS](https://img.shields.io/badge/AWS-EC2%20Deployment-FF9900.svg)](https://aws.amazon.com/ec2/)
+[![Monitoring](https://img.shields.io/badge/Monitoring-Prometheus%20%7C%20Grafana-E6522C.svg)](#monitoring-and-alerting)
 
-# DevOps Production Platform
+A production-style DevOps project that demonstrates how to build, containerize, test, scan, monitor, and automatically deploy a Flask application with PostgreSQL using Docker, Nginx, GitHub Actions, Terraform, Kubernetes manifests, Prometheus, Grafana, Alertmanager, Node Exporter, and AWS EC2.
 
-A production-style DevOps project that demonstrates how to build, containerize, monitor, alert on, and automate deployment workflows for a Flask backend using Docker, PostgreSQL, Prometheus, Alertmanager, Grafana, GitHub Actions, Terraform, Kubernetes, and AWS.
+---
 
-## Project Overview
+## Highlights
 
-This repository showcases practical DevOps skills across:
+- Containerized Flask + PostgreSQL application
+- Nginx reverse proxy for local and production access
+- Health and readiness endpoints for deployment reliability
+- Prometheus, Grafana, Alertmanager, and Node Exporter integration
+- CI/CD pipeline with linting, formatting, tests, dependency audit, Terraform validation, image scanning, and Docker image publishing
+- Automated EC2 deployment from GitHub Actions over SSH
+- Production deployment flow using Docker Compose
+- Kubernetes manifests with readiness/liveness probes and autoscaling structure
 
-- application containerization
-- infrastructure automation
-- observability and alerting
-- CI/CD automation
-- cloud and Kubernetes deployment structure
-
-The platform includes:
-
-- a Flask backend application
-- PostgreSQL as the application database
-- Docker Compose for local multi-service orchestration
-- Prometheus for metrics collection and alert evaluation
-- Alertmanager for email notifications
-- Grafana for dashboards and visualization
-- Node Exporter for infrastructure metrics
-- GitHub Actions for testing and Docker image publishing
-- Terraform for infrastructure-as-code
-- Kubernetes manifests for container orchestration deployment structure
-- AWS support for cloud infrastructure workflows
+---
 
 ## Architecture
 
-The local stack contains the following services:
-
-- **backend** – Flask application exposing application endpoints and Prometheus metrics
-- **postgres** – PostgreSQL database for backend persistence
-- **prometheus** – scrapes metrics and evaluates alert rules
-- **alertmanager** – sends email notifications when alerts fire
-- **grafana** – visualizes metrics and dashboards
-- **node-exporter** – exposes infrastructure metrics
-
-## Repository Structure
+### Application Flow
 
 ```text
+Client
+  |
+  v
+Nginx
+  |
+  v
+Flask Backend
+  |
+  v
+PostgreSQL
+CI/CD Flow
+text
+Developer Push
+   |
+   v
+GitHub Actions
+   ├── Ruff / Black / Pytest / pip-audit
+   ├── Terraform fmt / validate
+   ├── Docker image build
+   ├── Trivy image scan
+   ├── Docker Hub push
+   └── SSH deploy to AWS EC2
+             |
+             v
+        Docker Compose (prod)
+             |
+             v
+      Nginx + Flask + PostgreSQL
+Monitoring Flow
+text
+Flask metrics ----\
+Node Exporter -----\ 
+Prometheus ---------> Grafana
+Alert rules --------> Alertmanager ----> Email notifications
+Repository Structure
+text
 .
 ├── .github/workflows/
 │   └── ci-cd.yml
 ├── app/
 │   └── backend/
+│       ├── Dockerfile
+│       ├── app.py
+│       ├── init_db.py
+│       ├── models.py
+│       ├── routes.py
+│       ├── extensions.py
+│       ├── tests/
+│       └── requirements.txt
+├── deploy/
+│   ├── deploy.sh
+│   ├── ec2-bootstrap.sh
+│   └── verify.sh
 ├── docs/
 │   └── screenshots/
 ├── kubernetes/
@@ -70,303 +90,341 @@ The local stack contains the following services:
 │   ├── alert.rules.yml
 │   ├── alertmanager.yml
 │   ├── prometheus.yml
-│   ├── grafana/
-│   │   ├── dashboards/
-│   │   └── provisioning/
-│   └── secrets/                  # local only, not committed
+│   └── grafana/
+├── nginx/
+│   └── nginx.conf
 ├── terraform/
 ├── docker-compose.yml
+├── docker-compose.prod.yml
 ├── .env.example
 ├── LICENSE
 └── README.md
-
-
+Tech Stack
+Application
+Python
+Flask
+PostgreSQL
+SQLAlchemy
+Gunicorn
+Containers and Proxy
+Docker
+Docker Compose
+Nginx
+Monitoring and Alerting
+Prometheus
+Grafana
+Alertmanager
+Node Exporter
+CI/CD and Security
+GitHub Actions
+Ruff
+Black
+pytest
+pip-audit
+Trivy
+Docker Hub
+Infrastructure and Cloud
+Terraform
+AWS EC2
+Kubernetes manifests
 Features
 Containerized Flask backend with PostgreSQL
+Nginx reverse proxy in front of the application
 Local multi-container orchestration using Docker Compose
+Production deployment using docker-compose.prod.yml
+Health and readiness endpoints for application reliability
+Docker health checks for backend and database services
 Monitoring with Prometheus
 Email alerting with Alertmanager and Gmail SMTP
 Dashboards with Grafana
 Infrastructure metrics with Node Exporter
-Automated testing and Docker image publishing with GitHub Actions
-Terraform-ready infrastructure-as-code structure
-Kubernetes manifest support
-Public portfolio-ready DevOps project structure
-Tech Stack
-Backend: Flask, Python
-Database: PostgreSQL
-Containers: Docker, Docker Compose
-Monitoring: Prometheus, Node Exporter
-Alerting: Alertmanager, Gmail SMTP
-Visualization: Grafana
-CI/CD: GitHub Actions
-Infrastructure as Code: Terraform
-Container Orchestration: Kubernetes
-Cloud: AWS
+Automated linting, formatting, dependency audit, and tests with GitHub Actions
+Docker image vulnerability scanning with Trivy
+Docker image publishing to Docker Hub
+Automated EC2 deployment from GitHub Actions over SSH
+Terraform validation in CI
+Kubernetes manifests with readiness/liveness probes and autoscaling structure
+Local Setup
 Prerequisites
-Before running the project locally, ensure you have:
+Install the following:
 
 Docker
 Docker Compose
 Git
-a Gmail account with:
+For Alertmanager email notifications, also prepare:
+
+a Gmail account
 2-Step Verification enabled
-an App Password created for SMTP alerting
-Local Setup
+a Gmail App Password
 1. Clone the repository
 bash
 git clone https://github.com/Alibras257/devops-production-platform.git
 cd devops-production-platform
 2. Create the environment file
-Create a .env file in the project root:
+bash
+cp .env.example .env
+Example:
 
 env
 POSTGRES_USER=devuser
 POSTGRES_PASSWORD=devpass
 POSTGRES_DB=devdb
-Or copy from the example file:
-
-bash
-cp .env.example .env
 3. Create the Alertmanager secret file
-Create the Gmail App Password file used by Alertmanager:
-
 bash
 mkdir -p monitoring/secrets
 echo "YOUR_GMAIL_APP_PASSWORD" > monitoring/secrets/gmail_app_password.txt
-Use a Gmail App Password, not your normal Gmail account password.
-
-4. Start the platform
+4. Start the local stack
 bash
 docker-compose up --build
 Local Service URLs
-Once the stack is running, you can access:
+After startup:
 
-Flask backend: http://localhost:5000
+Application: http://localhost:8080
+Health check: http://localhost:8080/health
+Readiness check: http://localhost:8080/ready
 Prometheus: http://localhost:9090
 Alertmanager: http://localhost:9093
 Grafana: http://localhost:3000
 Node Exporter metrics: http://localhost:9100/metrics
-Monitoring and Alerting
-Prometheus is configured to scrape:
+Health and Readiness Checks
+The backend exposes:
 
-Flask backend metrics
-Node Exporter metrics
-Prometheus self-metrics
-Alertmanager metrics
-Alert rules include:
+/health → confirms the app process is alive
+/ready → confirms the app can reach PostgreSQL
+These endpoints are used for:
 
-FlaskBackendDown
-NodeExporterDown
-PrometheusDown
-AlertmanagerDown
-HighCPUUsage
-Alertmanager is configured to send email notifications using Gmail SMTP.
-
-How to Test Alerts
-To force a backend-down alert:
+Docker health checks
+Kubernetes readiness/liveness probes
+deployment verification
+Example:
 
 bash
+curl http://localhost:8080/health
+curl http://localhost:8080/ready
+Monitoring and Alerting
+Prometheus is configured to scrape metrics from:
+
+Flask backend
+Node Exporter
+Prometheus
+Alertmanager
+Alerting examples include:
+
+backend down
+Node Exporter down
+Prometheus down
+Alertmanager down
+high CPU usage
+Alertmanager is configured to send notifications through Gmail SMTP.
+
+Test an alert locally
+bash
 docker stop flask-backend
-Wait at least 1–2 minutes because the alert rule uses a for duration before entering the firing state.
+Wait 1–2 minutes, then verify:
 
-Then verify:
-
-Prometheus alerts page: http://localhost:9090/alerts
-Alertmanager UI: http://localhost:9093
-You should also receive an email notification.
-
-To restore the backend:
+http://localhost:9090/alerts
+http://localhost:9093
+Restore the backend:
 
 bash
 docker start flask-backend
-If send_resolved: true is enabled in Alertmanager, you should also receive a recovery email.
-
-Grafana
-Grafana is included for dashboard visualization and observability.
-
-Typical usage includes:
-
-infrastructure monitoring dashboards
-backend service health dashboards
-Prometheus datasource integration
-tracking metrics over time
-Default local URL:
-
-text
-http://localhost:3000
-If dashboards and datasources are provisioned through the monitoring/grafana/ directory, Grafana will load them automatically on startup.
-
 CI/CD Pipeline
-GitHub Actions is used to automate testing and Docker image publishing.
+GitHub Actions automates the delivery pipeline.
 
-Workflow behavior
-On:
+Pipeline stages
+On push to main and pull requests targeting main, the workflow runs:
 
-push to main
-pull requests targeting main
-The pipeline:
+Lint, format, audit, and test
 
-starts a PostgreSQL service in GitHub Actions
-installs Python dependencies
-runs backend tests
-builds the backend Docker image
-pushes the image to Docker Hub on successful push to main
+Ruff
+Black
+pip-audit
+pytest
+Terraform validation
+
+terraform fmt -check
+terraform init -backend=false
+terraform validate
+Docker image security scan
+
+Docker build
+Trivy scan
+Docker image publish
+
+build backend image
+push image to Docker Hub on successful push to main
+Automated EC2 deployment
+
+connect to EC2 over SSH
+pull latest image
+redeploy containers
+verify /health and /ready
 Required GitHub Secrets
-To publish Docker images, configure these repository secrets:
-
+Docker Hub
 DOCKERHUB_USERNAME
 DOCKERHUB_TOKEN
-Terraform
-The repository includes Terraform configuration for infrastructure-as-code workflows.
+EC2 Deployment
+EC2_HOST
+EC2_USER
+EC2_SSH_KEY
+EC2_APP_DIR
+Production Deployment on EC2
+The project supports production-style deployment to AWS EC2 using docker-compose.prod.yml.
 
-Typical Terraform usage may include:
+First-time server bootstrap
+bash
+bash deploy/ec2-bootstrap.sh
+This installs:
 
-provisioning AWS infrastructure
-networking resources
-compute resources
-deployment support for application services
-Do not commit real terraform.tfvars files or cloud credentials.
+Docker Engine
+Docker Compose plugin
+Create .env on EC2
+Example:
+
+env
+DOCKERHUB_USERNAME=yourdockerhubusername
+POSTGRES_USER=devuser
+POSTGRES_PASSWORD=devpass
+POSTGRES_DB=devdb
+Initialize the database once
+bash
+docker compose -f docker-compose.prod.yml down -v
+docker compose -f docker-compose.prod.yml up -d postgres
+docker compose -f docker-compose.prod.yml run --rm backend python init_db.py
+Start the production stack
+bash
+docker compose -f docker-compose.prod.yml up -d
+Verify deployment
+bash
+bash deploy/verify.sh
+Deployment Scripts
+deploy/ec2-bootstrap.sh
+Bootstraps an EC2 instance with Docker and Docker Compose.
+
+deploy/deploy.sh
+Pulls the latest images and starts the production stack.
+
+deploy/verify.sh
+Checks the deployed application using /health and /ready.
+
+app/backend/init_db.py
+Runs one-time database initialization outside Gunicorn startup to avoid multi-worker race conditions.
 
 Kubernetes
-The repository also includes Kubernetes manifests for deployment structure and orchestration practice.
+The repository includes Kubernetes manifests for deployment structure and orchestration practice, including:
 
-These manifests may include resources such as:
-
-deployments
-services
+namespace
+backend deployment
+backend service
+PostgreSQL deployment
+PostgreSQL service
+persistent volume claim
+configmap
+secret example
 ingress
-configmaps
-secrets
-autoscaling configuration
-persistent volume claims
-If you use Kubernetes secrets, keep real values out of public repositories. Use example manifests or placeholders instead.
+horizontal pod autoscaler
+The backend deployment includes:
+
+readiness probe
+liveness probe
+resource requests and limits
+Terraform
+The Terraform configuration currently supports:
+
+formatting checks
+initialization without backend
+validation in CI
+The Terraform directory is structured for future AWS infrastructure provisioning enhancements.
 
 Screenshots
-Add screenshots to strengthen the project presentation.
-
-Recommended location:
+Screenshots are stored in:
 
 text
 docs/screenshots/
-Recommended screenshots:
+Suggested visuals include:
 
 Prometheus targets
 Prometheus alerts
 Alertmanager UI
 Grafana dashboard
-received email alert
-GitHub Actions successful workflow run
-Prometheus Targets
-Prometheus Targets
+email alert examples
+GitHub Actions successful workflow runs
+Useful Commands
+Start local stack
+bash
+docker-compose up --build
+Stop local stack
+bash
+docker-compose down
+Rebuild local stack
+bash
+docker-compose down
+docker-compose up --build
+Check local health
+bash
+curl http://localhost:8080/health
+curl http://localhost:8080/ready
 
-Prometheus Alerts
-Prometheus Alerts
-
-Alertmanager UI
-Alertmanager UI
-
-Grafana Dashboard
-Grafana Dashboard
-
-Email Alert
-Email Alert
-
-GitHub Actions Success
-GitHub Actions Success
-
+Start production stack
+bash
+docker compose -f docker-compose.prod.yml up -d
+Pull latest production images
+bash
+docker compose -f docker-compose.prod.yml pull
+Run DB initialization
+bash
+docker compose -f docker-compose.prod.yml run --rm backend python init_db.py
+Verify production deployment
+bash
+bash deploy/verify.sh
 Security Notes
 This repository is structured to avoid committing secrets.
 
-Do not commit
+Do not commit:
+
 .env
 monitoring/secrets/gmail_app_password.txt
-terraform.tfvars
 cloud credentials
 API keys
 real SMTP passwords
 real Kubernetes secret values
-Secret handling used in this project
-local environment variables are stored in .env
-Gmail SMTP authentication uses a mounted local secret file
-example configuration files are safe to commit
-ignored files are managed through .gitignore
-If any secret was ever accidentally committed, it should be rotated immediately.
+private SSH keys
+Recommended secret handling:
 
-Recommended Verification Steps
-After setup, verify the following:
+local environment variables in .env
+GitHub Actions secrets for CI/CD
+server-side .env on EC2
+example secret files only in version control
+If any secret is exposed, rotate it immediately.
 
-Backend
-bash
-curl http://localhost:5000
-Prometheus targets
-Open:
-
-text
-http://localhost:9090/targets
-Ensure targets are up.
-
-Alert rules
-Open:
-
-text
-http://localhost:9090/rules
-Alertmanager
-Open:
-
-text
-http://localhost:9093
-Grafana
-Open:
-
-text
-http://localhost:3000
-Useful Commands
-Start services
-bash
-docker-compose up --build
-Stop services
-bash
-docker-compose down
-Rebuild and restart
-bash
-docker-compose down
-docker-compose up --build
-View Alertmanager logs
-bash
-docker logs alertmanager
-Trigger a backend-down alert
-bash
-docker stop flask-backend
-Restore backend
-bash
-docker start flask-backend
 Skills Demonstrated
 This project demonstrates:
 
 Docker containerization
+reverse proxy configuration
 multi-service orchestration
-service networking
-environment and secret management basics
-infrastructure monitoring
-alerting and incident notification
-dashboard visualization
-CI/CD automation
-Terraform project structure
+health and readiness checks
+environment and secret handling
+monitoring and observability
+alerting and notification workflows
+CI/CD pipeline design
+container image security scanning
+Infrastructure as Code validation
+EC2 deployment automation
+deployment troubleshooting
 Kubernetes deployment structure
-portfolio-grade DevOps documentation
 Future Improvements
 Potential next enhancements:
 
-add Nginx reverse proxy
-add HTTPS/TLS
-improve backend health checks
-add memory, disk, and container restart alerts
-add linting and security scanning to CI
-add Terraform validation in CI
-add full AWS deployment automation
-add Kubernetes deployment guide
-use managed secret stores in production environments
+HTTPS/TLS with Nginx and Let's Encrypt
+Flask-Migrate / Alembic for schema migrations
+full Terraform-based AWS infrastructure provisioning
+remote Terraform state management
+staging and production environment separation
+AWS SSM Parameter Store or Secrets Manager integration
+Kubernetes deployment to a live cluster such as EKS
+blue/green or rolling deployment strategy
+centralized log aggregation
 License
 This project is licensed under the MIT License.
 
