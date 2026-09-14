@@ -211,6 +211,20 @@ jobs:
               exit 1
             fi
 
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d
+            if [ ! -f docker-compose.prod.yml ]; then
+              echo "ERROR: docker-compose.prod.yml not found"
+              exit 1
+            fi
+
+            if [ ! -f deploy/deploy.sh ]; then
+              echo "ERROR: deploy/deploy.sh not found"
+              exit 1
+            fi
+
+            if [ ! -f deploy/verify.sh ]; then
+              echo "ERROR: deploy/verify.sh not found"
+              exit 1
+            fi
+
+            bash deploy/deploy.sh
             bash deploy/verify.sh
