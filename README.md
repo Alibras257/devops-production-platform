@@ -8,19 +8,20 @@
 [![AWS](https://img.shields.io/badge/AWS-EC2%20Deployment-FF9900.svg)](https://aws.amazon.com/ec2/)
 [![Monitoring](https://img.shields.io/badge/Monitoring-Prometheus%20%7C%20Grafana-E6522C.svg)](#monitoring-and-alerting)
 
-A production-style DevOps project that demonstrates how to build, containerize, test, scan, monitor, and automatically deploy a Flask application with PostgreSQL using Docker, Nginx, GitHub Actions, Terraform, Kubernetes manifests, Prometheus, Grafana, Alertmanager, Node Exporter, and AWS EC2.
+A production-style DevOps project that demonstrates how to build, containerise, test, scan, monitor, migrate, and automatically deploy a Flask application with PostgreSQL using Docker, Nginx, GitHub Actions, Terraform, Kubernetes manifests, Prometheus, Grafana, Alertmanager, Node Exporter, and AWS EC2.
 
 ---
 
 ## Highlights
 
-- Containerized Flask + PostgreSQL application
+- Containerised Flask + PostgreSQL application
 - Nginx reverse proxy for local and production access
 - Health and readiness endpoints for deployment reliability
 - Prometheus, Grafana, Alertmanager, and Node Exporter integration
 - CI/CD pipeline with linting, formatting, tests, dependency audit, Terraform validation, image scanning, and Docker image publishing
 - Automated EC2 deployment from GitHub Actions over SSH
 - Production deployment flow using Docker Compose
+- Flask-Migrate and Alembic-based database schema migrations
 - Kubernetes manifests with readiness/liveness probes and autoscaling structure
 
 ---
@@ -54,10 +55,13 @@ GitHub Actions
    └── SSH deploy to AWS EC2
              |
              v
-        Docker Compose (prod)
+        deploy.sh
              |
-             v
-      Nginx + Flask + PostgreSQL
+             ├── Pull latest image
+             ├── Start PostgreSQL
+             ├── Run Alembic migrations
+             ├── Start application stack
+             └── Verify /health and /ready
 Monitoring Flow
 text
 Flask metrics ----\
@@ -73,10 +77,11 @@ text
 │   └── backend/
 │       ├── Dockerfile
 │       ├── app.py
-│       ├── init_db.py
+│       ├── manage.py
 │       ├── models.py
 │       ├── routes.py
 │       ├── extensions.py
+│       ├── migrations/
 │       ├── tests/
 │       └── requirements.txt
 ├── deploy/
@@ -105,6 +110,8 @@ Python
 Flask
 PostgreSQL
 SQLAlchemy
+Flask-Migrate
+Alembic
 Gunicorn
 Containers and Proxy
 Docker
@@ -128,7 +135,7 @@ Terraform
 AWS EC2
 Kubernetes manifests
 Features
-Containerized Flask backend with PostgreSQL
+Containerised Flask backend with PostgreSQL
 Nginx reverse proxy in front of the application
 Local multi-container orchestration using Docker Compose
 Production deployment using docker-compose.prod.yml
@@ -143,6 +150,7 @@ Docker image vulnerability scanning with Trivy
 Docker image publishing to Docker Hub
 Automated EC2 deployment from GitHub Actions over SSH
 Terraform validation in CI
+Database schema migrations with Flask-Migrate and Alembic
 Kubernetes manifests with readiness/liveness probes and autoscaling structure
 Local Setup
 Prerequisites
@@ -151,6 +159,7 @@ Install the following:
 Docker
 Docker Compose
 Git
+Python 3.12 (optional for running migration commands locally)
 For Alertmanager email notifications, also prepare:
 
 a Gmail account
@@ -201,6 +210,29 @@ Example:
 bash
 curl http://localhost:8080/health
 curl http://localhost:8080/ready
+Database Migrations
+This project uses Flask-Migrate and Alembic for schema versioning and database migrations.
+
+Initialise migrations locally
+Run from app/backend:
+
+bash
+python -m flask --app app.py db init
+Only run this once when setting up migrations for the first time.
+
+Generate a migration
+bash
+python -m flask --app app.py db migrate -m "describe your schema change"
+Apply migrations
+bash
+python -m flask --app app.py db upgrade
+Why this matters
+Using migrations is safer than relying on automatic table creation at application startup. It supports:
+
+explicit schema versioning
+repeatable deployments
+safer production updates
+controlled database evolution over time
 Monitoring and Alerting
 Prometheus is configured to scrape metrics from:
 
@@ -257,8 +289,11 @@ Automated EC2 deployment
 
 connect to EC2 over SSH
 pull latest image
-redeploy containers
+start PostgreSQL
+run Flask-Migrate/Alembic upgrades
+start the full application stack
 verify /health and /ready
+
 Required GitHub Secrets
 Docker Hub
 DOCKERHUB_USERNAME
@@ -286,14 +321,17 @@ DOCKERHUB_USERNAME=yourdockerhubusername
 POSTGRES_USER=devuser
 POSTGRES_PASSWORD=devpass
 POSTGRES_DB=devdb
-Initialize the database once
+
+Deploy or update the application
 bash
-docker compose -f docker-compose.prod.yml down -v
-docker compose -f docker-compose.prod.yml up -d postgres
-docker compose -f docker-compose.prod.yml run --rm backend python init_db.py
-Start the production stack
-bash
-docker compose -f docker-compose.prod.yml up -d
+bash deploy/deploy.sh
+This script:
+
+pulls the latest images
+starts PostgreSQL first
+waits for database health
+applies database migrations with Alembic
+starts the full application stack
 Verify deployment
 bash
 bash deploy/verify.sh
@@ -302,13 +340,10 @@ deploy/ec2-bootstrap.sh
 Bootstraps an EC2 instance with Docker and Docker Compose.
 
 deploy/deploy.sh
-Pulls the latest images and starts the production stack.
+Pulls the latest images, starts PostgreSQL, waits for readiness, runs database migrations, and starts the production stack.
 
 deploy/verify.sh
 Checks the deployed application using /health and /ready.
-
-app/backend/init_db.py
-Runs one-time database initialization outside Gunicorn startup to avoid multi-worker race conditions.
 
 Kubernetes
 The repository includes Kubernetes manifests for deployment structure and orchestration practice, including:
@@ -337,18 +372,25 @@ validation in CI
 The Terraform directory is structured for future AWS infrastructure provisioning enhancements.
 
 Screenshots
-Screenshots are stored in:
+GitHub Actions Pipeline
+GitHub Actions Pipeline
 
-text
-docs/screenshots/
-Suggested visuals include:
+GitHub Actions EC2 Deployment
+GitHub Actions EC2 Deployment
 
-Prometheus targets
-Prometheus alerts
-Alertmanager UI
-Grafana dashboard
-email alert examples
-GitHub Actions successful workflow runs
+Grafana Dashboard
+Grafana Dashboard
+
+Prometheus Targets
+Prometheus Targets
+
+Prometheus Alerts
+Prometheus Alerts
+
+Email Alert Examples
+Email Alert 1
+Email Alert 2
+
 Useful Commands
 Start local stack
 bash
@@ -364,16 +406,20 @@ Check local health
 bash
 curl http://localhost:8080/health
 curl http://localhost:8080/ready
-
 Start production stack
 bash
 docker compose -f docker-compose.prod.yml up -d
 Pull latest production images
+
 bash
 docker compose -f docker-compose.prod.yml pull
-Run DB initialization
+Generate a new migration
+
 bash
-docker compose -f docker-compose.prod.yml run --rm backend python init_db.py
+python -m flask --app app.py db migrate -m "describe your schema change"
+Apply migrations
+bash
+python -m flask --app app.py db upgrade
 Verify production deployment
 bash
 bash deploy/verify.sh
@@ -389,6 +435,7 @@ API keys
 real SMTP passwords
 real Kubernetes secret values
 private SSH keys
+
 Recommended secret handling:
 
 local environment variables in .env
@@ -400,10 +447,11 @@ If any secret is exposed, rotate it immediately.
 Skills Demonstrated
 This project demonstrates:
 
-Docker containerization
+Docker containerisation
 reverse proxy configuration
 multi-service orchestration
 health and readiness checks
+database migration management
 environment and secret handling
 monitoring and observability
 alerting and notification workflows
@@ -417,14 +465,13 @@ Future Improvements
 Potential next enhancements:
 
 HTTPS/TLS with Nginx and Let's Encrypt
-Flask-Migrate / Alembic for schema migrations
 full Terraform-based AWS infrastructure provisioning
 remote Terraform state management
 staging and production environment separation
 AWS SSM Parameter Store or Secrets Manager integration
 Kubernetes deployment to a live cluster such as EKS
 blue/green or rolling deployment strategy
-centralized log aggregation
+centralised log aggregation
 License
 This project is licensed under the MIT License.
 
